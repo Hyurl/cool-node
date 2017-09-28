@@ -1,0 +1,28 @@
+{
+  "name": "cool-node",
+  "version": "1.0.0",
+  "description": "A cool and light weight framework based on node.js.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "framework",
+    "modelar",
+    "express",
+    "socket.io"
+  ],
+  "author": "Ayon Lee",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "ejs": "^2.5.7",
+    "express": "^4.15.4",
+    "express-session": "^1.15.5",
+    "memorystore": "^1.5.0",
+    "modelar": "^1.0.5",
+    "mysql": "^2.14.1",
+    "nodemailer": "^4.1.0",
+    "socket.io": "^2.0.3"
+  }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        <%=title%>
+    </title>
+</head>
+
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is your first Cool-Node app, you see this page because you have installed Cool-Node successfully.<br/>
+        Now you can do whatever you want to design you app with Cool-Node.</p>
+    <p>You can open your browser's console panel, a socket message has been sent to you. <br/>
+        When using Cool-Node, both HTTP request and socket communication are recommended to use.</p>
+
+    <script src="/js/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://<%=host%>:<%=port%>');
+        socket.on("SocketTest/showHello", function(data) {
+            console.log("Socket:", data);
+        }).on("SocketTest/repeatWhatISaid", function(data){
+            console.log("You just said:", data);
+        });
+        socket.emit("SocketTest/showHello");
+    </script>
+</body>
+
+</html>
