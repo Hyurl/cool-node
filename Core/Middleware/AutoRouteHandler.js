@@ -95,17 +95,13 @@ module.exports = (app) => {
         //Handle the procedure in a Promise context.
         new Promise((resolve, reject) => {
             try {
-                var index = req.hostname.indexOf(config.server.host);
-                if (index === 0) {
-                    var subdomain = "www";
-                } else if (index > 0) {
-                    var subdomain = req.hostname.substring(0, index - 1);
-                } else {
-                    //If the subdomain isn't recognized, throw 404 error.
-                    throw new Error("404 Not Found!");
-                }
                 var type = req.method,
-                    uri = req.url.substring(1);
+                    uri = req.url.substring(1),
+                    index = req.hostname.indexOf(config.server.host),
+                    subdomain = "www";
+                if (index > 0) {
+                    subdomain = req.hostname.substring(0, index - 1);
+                }
                 uri = path.normalize(uri).replace(/\\/g, "/");
                 if (uri[uri.length - 1] == "/")
                     uri = uri.substring(0, uri.length - 1);

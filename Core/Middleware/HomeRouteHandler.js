@@ -5,14 +5,10 @@ module.exports = (app) => {
     app.get("/", (req, res) => {
         new Promise((resolve, reject) => {
             try {
-                var index = req.hostname.indexOf(config.server.host);
-                if (index === 0) {
-                    var subdomain = "www";
-                } else if (index > 0) {
-                    var subdomain = req.hostname.substring(0, index - 1);
-                } else {
-                    //If the subdomain isn't recognized, throw 404 error.
-                    throw new Error("404 Not Found!");
+                var index = req.hostname.indexOf(config.server.host),
+                    subdomain = "www";
+                if (index > 0) {
+                    subdomain = req.hostname.substring(0, index - 1);
                 }
                 if (ControllerMap[subdomain] &&
                     ControllerMap[subdomain].Home &&
