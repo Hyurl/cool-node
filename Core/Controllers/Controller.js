@@ -36,19 +36,28 @@ renderer.code = function(code, lang, escaped) {
  */
 class Controller {
     constructor(options = {}) {
+        //ViewPath and defaultView will be auto set properly by the framework 
+        //when a request event fires.
         this.viewPath = options.viewPath || "App/Views";
         this.defaultView = options.defaultView || "index";
+
+        //If requireAuth true, when calling the controller unauthorized, a 401
+        //error will be thrown.
+        this.requireAuth = false;
     }
 
     /**
      * Sends a view file to the response context.
      * 
-     * @param  {String}  tplName  The template name. Template files are stored
-     *  in `App/Views/`, if the filename ends with .html as its extension 
-     *  name, you can pass this argument without the extension name.
+     * @param  {String}  tplName  [optional] The template name. Template files
+     *  are stored in `App[.subdomain]/Views/`, if the filename ends with 
+     *  .html as its extension name, you can pass this argument without an 
+     *  extension name. If this argument is missing, then the `defaultView`
+     *  will be used.
      * 
-     * @param  {Object}  vars  Additional variables passed to the template, 
-     *  these variables will replace the placeholders in the view file.
+     * @param  {Object}  vars  [optional] Additional variables passed to the 
+     *  template, these variables will replace the placeholders in the view 
+     *  file.
      * 
      * @return {String} Returns the contents of the template with its 
      *  placeholders replaced with `vars`.
@@ -71,12 +80,15 @@ class Controller {
      * This method rely on the module `highlightjs`, so when displaying code 
      * snippets, you need to include CSS files to the HTML page manually.
      * 
-     * @param  {String}  tplName  The template name. Template files are stored
-     *  in `App/Views/`, if the filename ends with .html as its extension 
-     *  name, you can pass this argument without the extension name.
+     * @param  {String}  tplName  [optional] The template name. Template files
+     *  are stored in `App[.subdomain]/Views/`, if the filename ends with 
+     *  .html as its extension name, you can pass this argument without an 
+     *  extension name. If this argument is missing, then the `defaultView`
+     *  will be used.
      * 
-     * @param  {Object}  vars  Additional variables passed to the template, 
-     *  these variables will replace the placeholders in the view file.
+     * @param  {Object}  vars  [optional] Additional variables passed to the 
+     *  template, these variables will replace the placeholders in the view 
+     *  file.
      * 
      * @return {String} Returns the contents of the template with its 
      *  placeholders replaced with `vars`.

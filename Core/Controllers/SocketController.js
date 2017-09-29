@@ -23,14 +23,6 @@ const Controller = require("./Controller");
  * name, which is `Controller/method`, so the client can listen to it for 
  * receiving data.
  */
-class SocketController extends Controller {
-    constructor(options = {}) {
-        super(options);
-
-        //If true, when calling the controller unauthorized, a 401 error will 
-        //be thrown.
-        this.requireAuth = false;
-    }
-}
+class SocketController extends Controller {}
 
 module.exports = SocketController;

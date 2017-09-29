@@ -48,7 +48,7 @@ class HttpController extends Controller {
         super(options);
 
         //This property carries the information of RESTful methods. each 
-        //method corresponding a method name.
+        //pair corresponding a method name and a request type.
         this.RESTfulMap = {
             get: "GET",
             create: "POST",
@@ -56,11 +56,7 @@ class HttpController extends Controller {
             delete: "DELETE",
         };
 
-        //If true, when calling the controller unauthorized, a 401 error will 
-        //be thrown.
-        this.requireAuth = false;
-
-        //If set, when unauthorized, fallback to the given URI.
+        //If fallbackTo is set, when unauthorized, fallback to the given URL.
         this.fallbackTo = "";
     }
 }
