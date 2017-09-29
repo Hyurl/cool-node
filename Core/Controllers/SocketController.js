@@ -24,8 +24,8 @@ const Controller = require("./Controller");
  * receiving data.
  */
 class SocketController extends Controller {
-    constructor() {
-        super();
+    constructor(options = {}) {
+        super(options);
 
         //If true, when calling the controller unauthorized, a 401 error will 
         //be thrown.

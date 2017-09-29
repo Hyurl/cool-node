@@ -44,8 +44,8 @@ const Controller = require("./Controller");
  * you can change them by reassigning the property `RESTfulMap`.
  */
 class HttpController extends Controller {
-    constructor() {
-        super();
+    constructor(options = {}) {
+        super(options);
 
         //This property carries the information of RESTful methods. each 
         //method corresponding a method name.

@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const HttpController = require("../Controllers/HttpController");
 
-function getController(subdomain, type, URI, params = {}, URI2 = []) {
+function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
     if (!URI.length) {
         throw new Error("404 Not Found!");
     }
@@ -17,12 +17,19 @@ function getController(subdomain, type, URI, params = {}, URI2 = []) {
             //If the matched controller is not a HttpController, throw 404 error.
             throw new Error("404 Not Found!");
         }
-        var instance = new ControllerMap[subdomain][className],
+        if (className == "Home") {
+            res.redirect(301, "/");
+            return false;
+        }
+        var instance = new ControllerMap[subdomain][className]({
+                viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`
+            }),
             methodName1 = URI[0];
         if (methodName1 === undefined) {
             //If only the class name is specified, then try to call index().
             if (instance.index instanceof Function) {
                 if (type == "GET") {
+                    instance.defaultView = className + "/index";
                     return { instance, methodName: "index", params };
                 } else {
                     throw new Error("405 Method Not Allowed!");
@@ -34,6 +41,7 @@ function getController(subdomain, type, URI, params = {}, URI2 = []) {
                         for (let i = 0; i < URI.length; i += 2) {
                             params[URI[i]] = URI[i + 1] || "";
                         }
+                        instance.defaultView = className + "/" + key;
                         return { instance, methodName: key, params };
                     }
                 }
@@ -52,13 +60,15 @@ function getController(subdomain, type, URI, params = {}, URI2 = []) {
             if (inMap) {
                 //Methods in the RESTful map can be specified directly.
                 if (instance.RESTfulMap[methodName1] == type) {
+                    instance.defaultView = className + "/" + methodName1;
                     return { instance, methodName: methodName1, params };
                 } else {
                     throw new Error("405 Method Not Allowed!");
                 }
             } else {
                 //Methods not in the RESTful map must specified without the 
-                //request type
+                //request type.
+                instance.defaultView = className + "/" + methodName2;
                 return { instance, methodName: methodName2, params };
             }
         } else if (instance.index instanceof Function) {
@@ -68,6 +78,7 @@ function getController(subdomain, type, URI, params = {}, URI2 = []) {
                 for (let i = start; i < URI.length; i += 2) {
                     params[URI[i]] = URI[i + 1] || "";
                 }
+                instance.defaultView = className + "/index";
                 return { instance, methodName: "index", params };
             } else {
                 throw new Error("405 Method Not Allowed!");
@@ -79,13 +90,14 @@ function getController(subdomain, type, URI, params = {}, URI2 = []) {
                     for (let i = 0; i < URI.length; i += 2) {
                         params[URI[i]] = URI[i + 1] || "";
                     }
+                    instance.defaultView = className + "/" + key;
                     return { instance, methodName: key, params };
                 }
             }
             throw new Error("404 Not Found!");
         }
     } else { //Class doesn't exist, test recursively.
-        return getController(subdomain, type, URI, params, URI2);
+        return getController(subdomain, type, URI, res, params, URI2);
     }
 }
 
@@ -106,7 +118,7 @@ module.exports = (app) => {
                 if (uri[uri.length - 1] == "/")
                     uri = uri.substring(0, uri.length - 1);
                 var URI = uri.split("/"),
-                    { instance, methodName, params } = getController(subdomain, type, URI);
+                    { instance, methodName, params } = getController(subdomain, type, URI, res);
                 if (instance.requireAuth && !req.user) {
                     if (instance.fallbackTo)
                         res.location(instance.fallbackTo);

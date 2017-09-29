@@ -13,7 +13,10 @@ module.exports = (app) => {
                 if (ControllerMap[subdomain] &&
                     ControllerMap[subdomain].Home &&
                     ControllerMap[subdomain].Home.prototype instanceof HttpController) {
-                    var instance = new ControllerMap[subdomain].Home;
+                    var instance = new ControllerMap[subdomain].Home({
+                        viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
+                        defaultView: "index"
+                    });
                     if (instance.requireAuth && !req.user) {
                         if (instance.fallbackTo)
                             res.location(instance.fallbackTo);

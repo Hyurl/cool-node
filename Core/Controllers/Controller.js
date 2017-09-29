@@ -35,8 +35,9 @@ renderer.code = function(code, lang, escaped) {
  * events.
  */
 class Controller {
-    constructor() {
-        this.viewPath = "App/Views";
+    constructor(options = {}) {
+        this.viewPath = options.viewPath || "App/Views";
+        this.defaultView = options.defaultView || "index";
     }
 
     /**
@@ -52,20 +53,15 @@ class Controller {
      * @return {String} Returns the contents of the template with its 
      *  placeholders replaced with `vars`.
      */
-    view(tplName, vars = {}) {
+    view(tplName = "", vars = {}) {
+        if (tplName === "" || typeof tplName == "object") {
+            vars = tplName || {};
+            tplName = this.defaultView;
+        }
         tplName = tplName.toString();
-        return new Promise((resolve, reject) => {
-            if (path.extname(tplName) === "")
-                tplName += ".html";
-            var file = "./" + this.viewPath + "/" + tplName;
-            ejs.renderFile(file, vars, {}, (err, content) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(content);
-                }
-            });
-        });
+        if (path.extname(tplName) === "")
+            tplName += ".html";
+        return this.__handleView(tplName, vars);
     }
 
     /**
@@ -85,11 +81,29 @@ class Controller {
      * @return {String} Returns the contents of the template with its 
      *  placeholders replaced with `vars`.
      */
-    viewMarkdown(tplName, vars = {}) {
+    viewMarkdown(tplName = "", vars = {}) {
+        if (tplName === "" || typeof tplName == "object") {
+            vars = tplName || {};
+            tplName = this.defaultView;
+        }
         if (path.extname(tplName) === "")
             tplName += ".md";
-        return this.view(tplName, vars).then(content => {
+        return this.__handleView(tplName, vars).then(content => {
             return marked(content, { renderer: renderer });
+        });
+    }
+
+    /** Handles a view template. */
+    __handleView(tplName, vars) {
+        return new Promise((resolve, reject) => {
+            var file = "./" + this.viewPath + "/" + tplName;
+            ejs.renderFile(file, vars, {}, (err, content) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(content);
+                }
+            });
         });
     }
 

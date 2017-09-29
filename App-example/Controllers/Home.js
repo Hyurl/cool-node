@@ -8,7 +8,8 @@ module.exports = class Home extends HttpController {
     /** GET / or GET /Home/ */
     index() {
         return this.view("index", {
-            title: "Cool-Node"
+            title: "Cool-Node",
+            host: req.headers.host
         });
     }
 }

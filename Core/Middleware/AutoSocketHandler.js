@@ -41,7 +41,10 @@ module.exports = (io) => {
             socket.on(event, (data) => {
                 //Handle the procedure in a Promise context.
                 new Promise((resolve, reject) => {
-                    var instance = new Class;
+                    var instance = new Class({
+                        viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
+                        defaultView: event
+                    });
                     if (instance.requireAuth && !socket.user) {
                         throw new Error("401 Unauthorized!");
                     }
