@@ -68,7 +68,7 @@ function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
             } else {
                 //Methods not in the RESTful map must specified without the 
                 //request type.
-                instance.defaultView = className + "/" + methodName2;
+                instance.defaultView = className + "/" + methodName1;
                 return { instance, methodName: methodName2, params };
             }
         } else if (instance.index instanceof Function) {
