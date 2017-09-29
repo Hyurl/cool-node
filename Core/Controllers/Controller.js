@@ -21,11 +21,8 @@ renderer.heading = function(text, level) {
 //Render markdown codes to be highlighted.
 renderer.code = function(code, lang, escaped) {
     return `<pre>
-    <code class="lang-${lang} hljs">
-        ${hljs.highlightAuto(code).value}
-    </code>
-</pre>
-`;
+    <code class="lang-${lang} hljs">${hljs.highlightAuto(code).value}</code>
+</pre>\n`;
 };
 
 /**
