@@ -1,4 +1,5 @@
 const ejs = require("ejs");
+const fs = require("fs");
 const path = require("path");
 const marked = require("marked");
 const hljs = require("highlightjs");
@@ -55,7 +56,8 @@ class Controller {
      *  template, these variables will replace the placeholders in the view 
      *  file.
      * 
-     * @return {String} Returns the contents of the template with its 
+     * @return {String} Returns a Promise, and the only argument passed to the
+     *  callback of `then()` is the contents of the template with its 
      *  placeholders replaced with `vars`.
      */
     view(tplName = "", vars = {}) {
@@ -66,7 +68,16 @@ class Controller {
         tplName = tplName.toString();
         if (path.extname(tplName) === "")
             tplName += ".html";
-        return this.__handleView(tplName, vars);
+        return new Promise((resolve, reject) => {
+            var file = "./" + this.viewPath + "/" + tplName;
+            ejs.renderFile(file, vars, {}, (err, content) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(content);
+                }
+            });
+        });
     }
 
     /**
@@ -82,33 +93,20 @@ class Controller {
      *  extension name. If this argument is missing, then the `defaultView`
      *  will be used.
      * 
-     * @param  {Object}  vars  [optional] Additional variables passed to the 
-     *  template, these variables will replace the placeholders in the view 
-     *  file.
-     * 
-     * @return {String} Returns the contents of the template with its 
-     *  placeholders replaced with `vars`.
+     * @return {String} Returns a Promise, and the only argument passed to the
+     *  callback of `then()` is the parsed contents of the template.
      */
-    viewMarkdown(tplName = "", vars = {}) {
-        if (tplName === "" || typeof tplName == "object") {
-            vars = tplName || {};
-            tplName = this.defaultView;
-        }
+    viewMarkdown(tplName = "") {
+        tplName = tplName || this.defaultView;
         if (path.extname(tplName) === "")
             tplName += ".md";
-        return this.__handleView(tplName, vars).then(content => {
-            return marked(content, { renderer: renderer });
-        });
-    }
-
-    /** Handles a view template. */
-    __handleView(tplName, vars) {
         return new Promise((resolve, reject) => {
             var file = "./" + this.viewPath + "/" + tplName;
-            ejs.renderFile(file, vars, {}, (err, content) => {
+            fs.readFile(file, "utf8", (err, content)=>{
                 if (err) {
                     reject(err);
                 } else {
+                    content = marked(content, { renderer: renderer });
                     resolve(content);
                 }
             });
@@ -122,7 +120,8 @@ class Controller {
      * 
      * @param  {Number}  code  A code represented the status of the action.
      * 
-     * @return {Object} Return a object which carries these information:
+     * @return {Object} Returns a Promise, and the only argument passed to the
+     *  callback of `then()` is a object which carries these information:
      *  - `success` Indicates if the action is successful, always true.
      *  - `data` The same `data` given above.
      *  - `code` The same `code` given above.
@@ -144,7 +143,8 @@ class Controller {
      * 
      * @param  {Number}  code  A code represented the status of the action.
      * 
-     * @return {Object} Return a object which carries these information:
+     * @return {Object} Returns a Promise, and the only argument passed to the
+     *  callback of `then()` is a object which carries these information:
      *  - `success` Indicates if the action is successful, always false.
      *  - `msg` The same `msg` given above.
      *  - `code` The same `code` given above.
