@@ -108,17 +108,12 @@ module.exports = (app) => {
         new Promise((resolve, reject) => {
             try {
                 var type = req.method,
-                    uri = req.url.substring(1),
-                    index = req.hostname.indexOf(config.server.host),
-                    subdomain = "www";
-                if (index > 0) {
-                    subdomain = req.hostname.substring(0, index - 1);
-                }
+                    uri = req.url.substring(1);
                 uri = path.normalize(uri).replace(/\\/g, "/");
                 if (uri[uri.length - 1] == "/")
                     uri = uri.substring(0, uri.length - 1);
                 var URI = uri.split("/"),
-                    { instance, methodName, params } = getController(subdomain, type, URI, res);
+                    { instance, methodName, params } = getController(req.subdomain, type, URI, res);
                 if (instance.requireAuth && !req.user) {
                     if (instance.fallbackTo)
                         res.location(instance.fallbackTo);

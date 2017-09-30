@@ -16,15 +16,17 @@ global.config = config;
 //Load bootstrap.
 require("./Core/Bootstrap/ControllerLoader");
 
+//Handle subdomain requests.
+require("./Core/Middleware/HttpSubdomainHandler")(app);
 //Handle static resources.
-app.use(express.static("Public"));
+require("./Core/Middleware/StaticResourceHandler")(app, express);
 //Parse request body.
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 //Handle sessions.
 app.use(session);
 //Handle database connection.
-app.use(require("./Core/Middleware/HttpDBHandler"));
+require("./Core/Middleware/HttpDBHandler")(app);
 //Load user-defined middleware.
 require("./Middleware/http")(app);
 //Load pre-defined middleware.
@@ -39,6 +41,8 @@ server.listen(config.server.port, () => {
     console.log("Server started, please visit http://%s:%s.", host, port);
 });
 
+//Handle subdomain requests.
+require("./Core/Middleware/SocketSubdomainHandler")(io);
 //Handle sessions.
 require("./Core/Middleware/SocketSessionHandler")(io, session);
 //Handle database connection.

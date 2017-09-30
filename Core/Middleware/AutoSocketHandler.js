@@ -26,11 +26,7 @@ for (let subdomain in ControllerMap) {
 
 module.exports = (io) => {
     io.use((socket, next) => {
-        var index = socket.request.headers.host.indexOf(config.server.host),
-            subdomain = "www";
-        if (index > 0) {
-            subdomain = socket.request.headers.host.substring(0, index - 1);
-        }
+        var subdomain = socket.subdomain;
         if (!_ControllerMap[subdomain]) {
             //If no controller presents, close the socket connection.
             return socket.disconnect(true);
