@@ -69,7 +69,7 @@ class Controller {
         if (path.extname(tplName) === "")
             tplName += ".html";
         return new Promise((resolve, reject) => {
-            var file = "./" + this.viewPath + "/" + tplName;
+            var file = ROOT + "/" + this.viewPath + "/" + tplName;
             ejs.renderFile(file, vars, {}, (err, content) => {
                 if (err) {
                     reject(err);
@@ -101,8 +101,8 @@ class Controller {
         if (path.extname(tplName) === "")
             tplName += ".md";
         return new Promise((resolve, reject) => {
-            var file = "./" + this.viewPath + "/" + tplName;
-            fs.readFile(file, "utf8", (err, content)=>{
+            var file = ROOT + "/" + this.viewPath + "/" + tplName;
+            fs.readFile(file, "utf8", (err, content) => {
                 if (err) {
                     reject(err);
                 } else {
