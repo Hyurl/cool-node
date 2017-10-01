@@ -38,8 +38,8 @@ class Controller {
         this.viewPath = options.viewPath || "App/Views";
         this.defaultView = options.defaultView || "index";
 
-        //If requireAuth true, when calling the controller unauthorized, a 401
-        //error will be thrown.
+        //If requireAuth is true, when calling the controller unauthorized, a 
+        //401 error will be thrown.
         this.requireAuth = false;
     }
 
