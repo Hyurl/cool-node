@@ -56,8 +56,8 @@ class Controller {
      *  template, these variables will replace the placeholders in the view 
      *  file.
      * 
-     * @return {String} Returns a Promise, and the only argument passed to the
-     *  callback of `then()` is the contents of the template with its 
+     * @return {Promise} Returns a Promise, and the only argument passed to 
+     *  the callback of `then()` is the contents of the template with its 
      *  placeholders replaced with `vars`.
      */
     view(tplName = "", vars = {}) {
@@ -93,8 +93,8 @@ class Controller {
      *  extension name. If this argument is missing, then the `defaultView`
      *  will be used.
      * 
-     * @return {String} Returns a Promise, and the only argument passed to the
-     *  callback of `then()` is the parsed contents of the template.
+     * @return {Promise} Returns a Promise, and the only argument passed to 
+     *  the callback of `then()` is the parsed contents of the template.
      */
     viewMarkdown(tplName = "") {
         tplName = tplName || this.defaultView;
@@ -118,10 +118,11 @@ class Controller {
      * 
      * @param  {Any}  data  The data that needs to be send.
      * 
-     * @param  {Number}  code  A code represented the status of the action.
+     * @param  {Number}  code  [optional] A code represented the status of the
+     *  action.
      * 
-     * @return {Object} Returns a Promise, and the only argument passed to the
-     *  callback of `then()` is a object which carries these information:
+     * @return {Promise} Returns a Promise, and the only argument passed to 
+     *  the callback of `then()` is a object which carries these information:
      *  - `success` Indicates if the action is successful, always true.
      *  - `data` The same `data` given above.
      *  - `code` The same `code` given above.
@@ -139,12 +140,13 @@ class Controller {
     /**
      * Sends failed action results to the response context.
      * 
-     * @param  {Any}  msg  A message the indicates the failed reason.
+     * @param  {String}  msg  A message the indicates the failed reason.
      * 
-     * @param  {Number}  code  A code represented the status of the action.
+     * @param  {Number}  code  [optional] A code represented the status of the
+     *  action.
      * 
-     * @return {Object} Returns a Promise, and the only argument passed to the
-     *  callback of `then()` is a object which carries these information:
+     * @return {Promise} Returns a Promise, and the only argument passed to 
+     *  the callback of `then()` is a object which carries these information:
      *  - `success` Indicates if the action is successful, always false.
      *  - `msg` The same `msg` given above.
      *  - `code` The same `code` given above.
