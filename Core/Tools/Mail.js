@@ -1,14 +1,18 @@
-const NodeMailer = require("nodemailer");
+const Node-mailer = require("node-mailer");
 
 /**
- * A wrapper for NodeMailer to send emails.
+ * A wrapper for Node-mailer to send e-mails.
  */
 class Mail {
-
+    /**
+     * Create a new Mail instance with specified options or a subject.
+     * 
+     * @param {String|Object} options 
+     */
     constructor(options = {}) {
         if (typeof options == "string")
             options = { subject: options };
-        this.transporter = NodeMailer.createTransport(config.mail);
+        this.transporter = Node-mailer.createTransport(config.mail);
         this.__from = options.from || config.mail.from;
         this.__to = options.to || [];
         this.__cc = options.cc || [];
@@ -22,7 +26,7 @@ class Mail {
     /**
      * Sets the sender address.
      * 
-     * @param  {String}  addr  An email address, optionally you can set a 
+     * @param  {String}  addr  An e-mail address, optionally you can set a 
      *  name before the actual address.
      * 
      * @return {Mail} Returns the current instance for function chaining.
@@ -36,7 +40,7 @@ class Mail {
      * Sets receiver addresses, optionally you can call this method multiple 
      * times to concatenate addresses.
      * 
-     * @param {String|Array} addr A list of email addresses, each one passed 
+     * @param {String|Array} addr A list of e-mail addresses, each one passed 
      *  as an parameter, or just pass the fist parameter as an array.
      * 
      * @return {Mail} Returns the current instance for function chaining.
@@ -52,7 +56,7 @@ class Mail {
      * Sets receiver addresses on the CC field, optionally you can call this 
      * method multiple times to concatenate addresses.
      * 
-     * @param {String|Array} addr A list of email addresses, each one passed 
+     * @param {String|Array} addr A list of e-mail addresses, each one passed 
      *  as an parameter, or just pass the fist parameter as an array.
      * 
      * @return {Mail} Returns the current instance for function chaining.
@@ -68,7 +72,7 @@ class Mail {
      * Sets receiver addresses on the BCC field, optionally you can call this 
      * method multiple times to concatenate addresses.
      * 
-     * @param {String|Array} addr A list of email addresses, each one passed 
+     * @param {String|Array} addr A list of e-mail addresses, each one passed 
      *  as an parameter, or just pass the fist parameter as an array. 
      * 
      * @return {Mail} Returns the current instance for function chaining.
@@ -81,7 +85,7 @@ class Mail {
     }
 
     /**
-     * Sets the subject of the email.
+     * Sets the subject of the e-mail.
      * 
      * @param  {String}  text  The subject name.
      * 
@@ -93,7 +97,7 @@ class Mail {
     }
 
     /**
-     * Sets the plain text version of the email.
+     * Sets the plain text version of the e-mail.
      * 
      * @param  {String}  content  The text content.
      * 
@@ -105,7 +109,7 @@ class Mail {
     }
 
     /**
-     * Sets the HTML version of the email.
+     * Sets the HTML version of the e-mail.
      * 
      * @param  {String}  content  The HTML content.
      * 
@@ -117,7 +121,7 @@ class Mail {
     }
 
     /**
-     * Sets a file as an attachment sent with the email, optionally you can 
+     * Sets a file as an attachment sent with the e-mail, optionally you can 
      * call this method multiple times to attach multiple files.
      * 
      * @param  {String}  path  The file path.
@@ -130,9 +134,9 @@ class Mail {
     }
 
     /**
-     * Sends the email to all receivers.
+     * Sends the e-mail to all recipients.
      * 
-     * @return {Promise} Returns a promise, and the only argument passed to 
+     * @return {Promise} Returns a Promise, and the only argument passed to 
      *  the callback of `then()` is an object which may carry these 
      *  information:
      *  - `messageId` the final Message-Id value;
