@@ -1,7 +1,7 @@
-const Node-mailer = require("node-mailer");
+const Nodemailer = require("nodemailer");
 
 /**
- * A wrapper for Node-mailer to send e-mails.
+ * A wrapper for Nodemailer to send e-mails.
  */
 class Mail {
     /**
@@ -12,7 +12,7 @@ class Mail {
     constructor(options = {}) {
         if (typeof options == "string")
             options = { subject: options };
-        this.transporter = Node-mailer.createTransport(config.mail);
+        this.transporter = Nodemailer.createTransport(config.mail);
         this.__from = options.from || config.mail.from;
         this.__to = options.to || [];
         this.__cc = options.cc || [];
