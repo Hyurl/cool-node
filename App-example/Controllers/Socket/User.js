@@ -1,5 +1,5 @@
 const SocketController = require("../SocketController");
-const User = require("modelar/User");
+const User = require("../../Models/User");
 
 /**
  * An example of SocketController using socket.io.

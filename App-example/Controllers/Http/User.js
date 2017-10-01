@@ -1,5 +1,5 @@
 const HttpController = require("../HttpController");
-const User = require("modelar/User");
+const User = require("../../Models/User");
 
 /**
  * An example of HttpController using RESTful API.
