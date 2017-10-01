@@ -7,8 +7,7 @@ const renderer = new marked.Renderer();
 
 //Render markdown headings.
 renderer.heading = function(text, level) {
-    var id = text.toLowerCase().replace(/\s/g, '-')
-        .match(/[\-0-9a-zA-Z]+/g).join("");
+    var id = text.replace(/\s/g, '-').match(/[\-0-9a-zA-Z]+/g).join("_");
     return `<h${level} id="${id}">
     <a class="heading-anchor" href="#${id}">
         <svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16">
@@ -47,10 +46,9 @@ class Controller {
      * Sends a view file to the response context.
      * 
      * @param  {String}  tplName  [optional] The template name. Template files
-     *  are stored in `App[.subdomain]/Views/`, if the filename ends with 
-     *  .html as its extension name, you can pass this argument without an 
-     *  extension name. If this argument is missing, then the `defaultView`
-     *  will be used.
+     *  are stored in `App[.subdomain]/Views/`, if the filename ends with a
+     *  `.html` as its extension name, you can pass this argument without one.
+     *  If this argument is missing, then the `defaultView` will be used.
      * 
      * @param  {Object}  vars  [optional] Additional variables passed to the 
      *  template, these variables will replace the placeholders in the view 
@@ -88,10 +86,9 @@ class Controller {
      * snippets, you need to include CSS files to the HTML page manually.
      * 
      * @param  {String}  tplName  [optional] The template name. Template files
-     *  are stored in `App[.subdomain]/Views/`, if the filename ends with 
-     *  .html as its extension name, you can pass this argument without an 
-     *  extension name. If this argument is missing, then the `defaultView`
-     *  will be used.
+     *  are stored in `App[.subdomain]/Views/`, if the filename ends with a
+     *  `.md` as its extension name, you can pass this argument without one. 
+     *  If this argument is missing, then the `defaultView` will be used.
      * 
      * @return {Promise} Returns a Promise, and the only argument passed to 
      *  the callback of `then()` is the parsed contents of the template.
