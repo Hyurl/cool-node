@@ -1,21 +1,20 @@
 const DB = require("modelar/DB");
-const Connections = {};
 
 module.exports = (io) => {
     io.use((socket, next) => {
+        var db;
         Object.defineProperty(socket, "db", {
             set: (v) => {},
             get: () => {
-                if (Connections[socket.id] === undefined) {
-                    Connections[socket.id] = new DB(config.database);
-                    socket.on("disconnect", () => {
-                        //If the socket connection is closed, recycle the database
-                        //connection.
-                        Connections[socket.id].recycle();
-                        delete Connections[socket.id];
+                if (db === undefined) {
+                    db = new DB(config.database);
+                    //When the socket is disconnected, recycle the database 
+                    //connection.
+                    socket.on("disconnected", () => {
+                        db.recycle();
                     });
                 }
-                return Connections[socket.id];
+                return db;
             }
         });
         next();

@@ -50,6 +50,8 @@ module.exports = (io) => {
                         //Send data to the client.
                         socket.emit(event, _data);
                     }
+                    //Recycle the database connection.
+                    socket.db.recycle();
                 }).catch(err => {
                     //If any error occurs, send a warning to the client.
                     socket.emit(event, {
@@ -57,6 +59,8 @@ module.exports = (io) => {
                         msg: err.message,
                         code: parseInt(err.message) || 500,
                     });
+                    //Recycle the database connection.
+                    socket.db.recycle();
                 });
             });
         }
