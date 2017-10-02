@@ -1,6 +1,6 @@
 {
   "name": "cool-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A cool and light weight framework based on Node.js.",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,15 @@
     "express",
     "socket.io"
   ],
-  "author": "Ayon Lee",
+  "author": {
+    "name": "Ayon Lee",
+    "email": "i@hyurl.com",
+    "url": "hyurl.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyurl/cool-node.git"
+  },
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
