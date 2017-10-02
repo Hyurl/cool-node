@@ -1,7 +1,7 @@
 {
   "name": "cool-node",
   "version": "1.0.0",
-  "description": "A cool and light weight framework based on node.js.",
+  "description": "A cool and light weight framework based on Node.js.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
