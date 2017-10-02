@@ -1,4 +1,4 @@
-const User = require(ROOT + "/App/Models/User");
+const User = require("modelar/User");
 
 module.exports = (io) => {
     io.use((socket, next) => {
