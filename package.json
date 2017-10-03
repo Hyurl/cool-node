@@ -1,6 +1,6 @@
 {
   "name": "cool-node",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A cool and light weight framework based on Node.js.",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,8 @@
     "ejs": "^2.5.7",
     "express": "^4.15.4",
     "express-session": "^1.15.5",
+    "highlightjs": "^9.10.0",
+    "marked": "^0.3.6",
     "memorystore": "^1.5.0",
     "modelar": "^1.0.5",
     "mysql": "^2.14.1",
