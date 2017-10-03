@@ -5,6 +5,8 @@ const marked = require("marked");
 const hljs = require("highlightjs");
 const renderer = new marked.Renderer();
 
+ejs.delimiter = typeof config.view == "object" ? (config.view.delimiter || "%") : "%";
+
 //Render markdown headings.
 renderer.heading = function(text, level) {
     var id = text.replace(/\s/g, '-').match(/[\-0-9a-zA-Z]+/g).join("_");
