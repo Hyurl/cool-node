@@ -5,11 +5,13 @@ module.exports = (io) => {
     if (fs.existsSync(path)) {
         var files = fs.readdirSync(path);
         for (let file of files) {
-            file = __dirname + "/socket/" + file;
+            file = path + file;
             let stat = fs.statSync(file);
             if (stat.isFile()) {
                 require(file)(io);
             }
         }
+    } else {
+        fs.mkdirSync(path);
     }
 };

@@ -11,5 +11,7 @@ module.exports = (app) => {
                 require(file)(app);
             }
         }
+    } else {
+        fs.mkdirSync(path);
     }
 };
