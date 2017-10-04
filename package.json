@@ -1,7 +1,7 @@
 {
   "name": "cool-node",
-  "version": "1.0.3",
-  "description": "A cool and light weight framework based on Node.js.",
+  "version": "1.0.4",
+  "description": "A cool and light weight framework for Node.js, with abilities of auto-routing, cross-protocol, multi-apps, and beyond.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -33,6 +33,7 @@
     "modelar": "^1.0.5",
     "mysql": "^2.14.1",
     "nodemailer": "^4.1.0",
+    "qs": "^6.5.1",
     "socket.io": "^2.0.3"
   }
 }

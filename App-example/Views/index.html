@@ -17,7 +17,7 @@
 
     <script src="/js/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://<%=host%>');
+        var socket = io.connect("<%=protocol%>://<%=host%>");
         socket.on("SocketTest/showHello", function(data) {
             console.log("Socket:", data);
         }).on("SocketTest/repeatWhatISaid", function(data) {

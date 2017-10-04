@@ -9,6 +9,7 @@ module.exports = class Home extends HttpController {
     index(req) {
         return this.view("index", {
             title: "Cool-Node",
+            protocol: req.protocol,
             host: req.headers.host
         });
     }

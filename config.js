@@ -2,11 +2,19 @@ const session = require("express-session");
 const MemoryStore = require('memorystore')(session);
 
 //Some of these settings are for their dependencies, you may check out all 
-//supported options on their official website.
+//supported options on their official websites.
 module.exports = {
     server: {
         host: "localhost",
-        port: 80
+        port: 80,
+        https: {
+            port: 0, //If set, start a HTTPS server.
+            forceRedirect: true, //If true, always redirect HTTP to HTTPS.
+            credentials: { //You could use {pfx, passphrase} as well.
+                key: "",
+                cert: "",
+            }
+        }
     },
     database: { //Settings for Modelar.
         type: "mysql",
