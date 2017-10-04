@@ -18,6 +18,8 @@ require("./Core/Middleware/StaticResourceHandler")(app, express);
 //Parse request body.
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+//Handler XML.
+require("./Core/Middleware/HttpXMLHandler")(app);
 //Handle sessions.
 app.use(session);
 //Handle database connection.

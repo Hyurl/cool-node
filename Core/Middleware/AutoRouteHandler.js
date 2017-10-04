@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const xml2js = require("xml2js");
 const HttpController = require("../Controllers/HttpController");
 
 function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
@@ -86,7 +87,7 @@ function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
         } else {
             //If no methods are specified, try to call RESTful methods.
             for (let key in instance.RESTfulMap) {
-                if (instance.RESTfulMap[key] == type) {
+                if (instance.RESTfulMap[key] == type && instance[key] instanceof Function) {
                     for (let i = 0; i < URI.length; i += 2) {
                         params[URI[i]] = URI[i + 1] || "";
                     }
@@ -126,9 +127,17 @@ module.exports = (app) => {
                 reject(err);
             }
         }).then(data => {
-            if (!res.headersSent) {
+            if (!res.headersSent && data !== undefined) {
                 //Send data to the client.
-                typeof result == "object" ? res.json(data) : res.send(data);
+                if (typeof data == "string" || data instanceof Buffer) {
+                    res.send(data);
+                } else if (typeof data == "object" && res.get("Content-Type").indexOf("text/xml") > -1) {
+                    res.sendAsXML(data);
+                } else if (typeof data != "function") {
+                    res.json(data);
+                } else {
+                    throw new Error("500 Internal Server Error!");
+                }
             }
         }).catch(err => {
             var code = parseInt(err.message) || 500,

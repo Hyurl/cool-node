@@ -46,7 +46,7 @@ module.exports = (io) => {
                     }
                     resolve(instance[method](data, socket));
                 }).then(_data => {
-                    if (_data) {
+                    if (_data !== undefined) {
                         //Send data to the client.
                         socket.emit(event, _data);
                     }
