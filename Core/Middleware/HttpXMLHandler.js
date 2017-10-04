@@ -22,7 +22,8 @@ module.exports  = (app) => {
             }
         };
         //Parse XML request body.
-        if(req.headers['content-type'].indexOf("text/xml") > -1){
+        var type = req.headers['content-type']
+        if(type && type.indexOf("text/xml") > -1){
             xml2js.parseString(req.body, {
                 ignoreAttrs: true,
                 async: true,

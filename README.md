@@ -34,7 +34,7 @@ Cool-Node also give you the ability to handle sessions and share their status
 across HTTP and WebSocket, what you can do with a HTTP request can also be 
 done with a WebSocket communication.
 
-## Multi-App Development
+## Multi-Apps Development
 
 Cool-Node is a framework that can build multiple applications at one time with
 only one server running. It can differ requests (whether they come form HTTP 
