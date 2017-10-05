@@ -38,7 +38,7 @@ const Controller = require("./Controller");
  * 
  * - `get` listen GET;
  * - `create` listen POST;
- * - `update` listen PUT;
+ * - `update` listen PATCH;
  * - `delete` listen DELETE;
  * 
  * you can change them by reassigning the property `RESTfulMap`.
@@ -52,7 +52,7 @@ class HttpController extends Controller {
         this.RESTfulMap = {
             get: "GET",
             create: "POST",
-            update: "PUT",
+            update: "PATCH",
             delete: "DELETE",
         };
 

@@ -18,7 +18,7 @@ module.exports = class extends HttpController {
         return User.use(req.db).get(req.params.id);
     }
 
-    /** e.g. PUT /Http/User/id/1 */
+    /** e.g. PATCH /Http/User/id/1 */
     update(req) {
         return this.get(req).then(user => {
             return user.update(req.body);

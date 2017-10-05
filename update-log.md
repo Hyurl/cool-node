@@ -1,8 +1,15 @@
 **This log starts from version 1.0.4.**
 
+## 1.0.8
+
+<small>(2017-10-5 23:30 UTC 0800)</small>
+
+1. Change the request type of `controller.update()` to `PACTH` according to 
+    [RFC5789](https://tools.ietf.org/html/rfc5789).
+
 ## 1.0.7
 
-<small>(2017-10-4 19:31 UTC 0800)</small>
+<small>(2017-10-5 17:50 UTC 0800)</small>
 
 1. Fix a bug while loading user-defined middleware.
 
