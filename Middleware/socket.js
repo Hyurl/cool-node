@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 module.exports = (io) => {
-    var path = __dirname + "/socket";
+    var path = __dirname + "/socket/";
     if (fs.existsSync(path)) {
         var files = fs.readdirSync(path);
         for (let file of files) {
