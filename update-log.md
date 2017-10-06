@@ -5,8 +5,9 @@
 <small>(2017-10-6 14:10 UTC 0800)</small>
 
 1. Add two global variables: `wsServer` and `wssServer`.
-2. More features has been added to controllers.
-3. Stability improved.
+2. Delete `/Middleware/http.js` and `/Middleware/socket.js`.
+3. More features has been added to controllers.
+4. Stability improved.
 
 ## 1.0.8
 

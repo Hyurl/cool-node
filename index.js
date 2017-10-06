@@ -8,6 +8,7 @@ const session = require("express-session")(config.session);
 
 //Load bootstrap.
 require("./Core/Bootstrap/ControllerLoader");
+var loadCustomHandler = require("./Core/Bootstrap/CustomHandlerLoader");
 
 //Auto-redirect HTTP to HTTPS.
 require("./Core/Middleware/HttpsRedirector")(app);
@@ -25,7 +26,7 @@ app.use(session);
 //Handle database connection.
 require("./Core/Middleware/HttpDBHandler")(app);
 //Load user-defined middleware.
-require("./Middleware/http")(app);
+loadCustomHandler(ROOT + "/Middleware/http", app);
 //Load pre-defined middleware.
 require("./Core/Middleware/HttpAuthHandler")(app);
 require("./Core/Middleware/HomeRouteHandler")(app);
@@ -71,7 +72,7 @@ var applySocketMiddleware = (io) => {
     //Handle database connection.
     require("./Core/Middleware/SocketDBHandler")(io);
     //Load user-defined middleware.
-    require("./Middleware/socket")(io);
+    loadCustomHandler(ROOT + "/Middleware/socket", io);
     //Load pre-defined middleware.
     require("./Core/Middleware/SocketAuthHandler")(io);
     require("./Core/Middleware/AutoSocketHandler")(io);
