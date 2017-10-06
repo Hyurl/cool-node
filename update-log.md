@@ -2,7 +2,7 @@
 
 ## 1.0.9
 
-<small>(2017-10-6 14:10 UTC 0800)</small>
+<small>(2017-10-6 15:40 UTC 0800)</small>
 
 1. Add two global variables: `wsServer` and `wssServer`.
 2. Delete `/Middleware/http.js` and `/Middleware/socket.js`.
