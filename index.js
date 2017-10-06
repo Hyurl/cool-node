@@ -31,23 +31,25 @@ require("./Core/Middleware/HttpAuthHandler")(app);
 require("./Core/Middleware/HomeRouteHandler")(app);
 require("./Core/Middleware/AutoRouteHandler")(app);
 
-var server, httpsServer, io, ios;
+var httpServer, httpsServer, wsServer, wssServer;
 
 //Start HTTP server.
-server = require("http").Server(app);
-server.listen(config.server.port, (err) => {
+httpServer = require("http").Server(app);
+httpServer.setTimeout(config.server.timeout || 30000);
+httpServer.listen(config.server.port, (err) => {
     if (err) {
         throw err;
         process.exit(1);
     }
     var host = config.server.host;
-    var port = server.address().port;
+    var port = httpServer.address().port;
     console.log("HTTP Server started, please visit http://%s:%s.", host, port);
 });
 
 if (config.server.https.port) {
     //Start HTTPS server.
     httpsServer = require("https").Server(config.server.https.credentials, app);
+    httpsServer.setTimeout(config.server.timeout || 30000);
     httpsServer.listen(config.server.https.port, (err) => {
         if (err) {
             throw err;
@@ -60,6 +62,7 @@ if (config.server.https.port) {
 }
 
 //Start WebSocket server.
+const SocketIO = require("socket.io");
 var applySocketMiddleware = (io) => {
     //Handle subdomain requests.
     require("./Core/Middleware/SocketSubdomainHandler")(io);
@@ -75,13 +78,14 @@ var applySocketMiddleware = (io) => {
 };
 if(!httpsServer || !config.server.https.forceRedirect){
     //Listen WS protocol.
-    io = require("socket.io")(server);
-    applySocketMiddleware(io);
-    io.on('connection', (socket) => {});
+    wsServer = SocketIO(httpServer);
+    applySocketMiddleware(wsServer);
 }
 if(httpsServer){
     //Listen WSS protocol.
-    ios = require("socket.io")(httpsServer);
-    applySocketMiddleware(ios);
-    ios.on('connection', (socket) => {});
+    wssServer = SocketIO(httpsServer);
+    applySocketMiddleware(wssServer);
 }
+
+global.wsServer = wsServer;
+global.wssServer = wssServer;

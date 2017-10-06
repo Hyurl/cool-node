@@ -1,5 +1,13 @@
 **This log starts from version 1.0.4.**
 
+## 1.0.9
+
+<small>(2017-10-6 14:10 UTC 0800)</small>
+
+1. Add two global variables: `wsServer` and `wssServer`.
+2. More features has been added to controllers.
+3. Stability improved.
+
 ## 1.0.8
 
 <small>(2017-10-5 23:30 UTC 0800)</small>

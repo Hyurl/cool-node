@@ -1,17 +1,18 @@
 const fs = require("fs");
+const path = require("path");
 
 module.exports = (io) => {
-    var path = __dirname + "/socket/";
-    if (fs.existsSync(path)) {
-        var files = fs.readdirSync(path);
+    var dir = __dirname + "/socket/";
+    if (fs.existsSync(dir)) {
+        var files = fs.readdirSync(dir);
         for (let file of files) {
-            file = path + file;
+            file = dir + file;
             let stat = fs.statSync(file);
-            if (stat.isFile()) {
+            if (stat.isFile() && path.extname(file) == "js") {
                 require(file)(io);
             }
         }
     } else {
-        fs.mkdirSync(path);
+        fs.mkdirSync(dir);
     }
 };

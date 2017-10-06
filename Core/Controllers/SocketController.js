@@ -23,6 +23,18 @@ const Controller = require("./Controller");
  * name, which is `Controller/method`, so the client can listen to it for 
  * receiving data.
  */
-class SocketController extends Controller {}
+class SocketController extends Controller {
+    /**
+     * Create a new socket controller instance.
+     * 
+     * @param  {Object}  options  Options for initiation.
+     * @param  {Socket}  socket  The underlying socket object.
+     */
+    constructor(options = {}, socket = null){
+        super(options);
+
+        this.authorized = socket && socket.user !== null;
+    }
+}
 
 module.exports = SocketController;

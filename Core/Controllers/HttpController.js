@@ -44,7 +44,13 @@ const Controller = require("./Controller");
  * you can change them by reassigning the property `RESTfulMap`.
  */
 class HttpController extends Controller {
-    constructor(options = {}) {
+    /**
+     * Create a new HTTP controller instance.
+     * 
+     * @param  {Object}  options  Options for initiation.
+     * @param  {ClientRequest}  req  The underlying request object.
+     */
+    constructor(options = {}, req = null) {
         super(options);
 
         //This property carries the information of RESTful methods. each 
@@ -58,6 +64,8 @@ class HttpController extends Controller {
 
         //If fallbackTo is set, when unauthorized, fallback to the given URL.
         this.fallbackTo = "";
+
+        this.authorized = req && req.user !== null;
     }
 }
 

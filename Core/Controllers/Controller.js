@@ -42,6 +42,9 @@ class Controller {
         //If requireAuth is true, when calling the controller unauthorized, a 
         //401 error will be thrown.
         this.requireAuth = false;
+
+        //This property indicates whether the operation is authorized.
+        this.authorized = false;
     }
 
     /**

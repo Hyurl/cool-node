@@ -40,8 +40,8 @@ module.exports = (io) => {
                     var instance = new Class({
                         viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                         defaultView: event
-                    });
-                    if (instance.requireAuth && !socket.user) {
+                    }, socket);
+                    if (instance.requireAuth && !instance.authorized) {
                         throw new Error("401 Unauthorized!");
                     }
                     resolve(instance[method](data, socket));

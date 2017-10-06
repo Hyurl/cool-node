@@ -5,8 +5,9 @@ const MemoryStore = require('memorystore')(session);
 //supported options on their official websites.
 module.exports = {
     server: {
-        host: "localhost",
+        host: "localhost", //Just for splitting subdomains.
         port: 80,
+        timeout: 30000,
         https: {
             port: 0, //If set, start a HTTPS server.
             forceRedirect: true, //If true, always redirect HTTP to HTTPS.

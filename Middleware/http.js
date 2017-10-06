@@ -1,17 +1,18 @@
 const fs = require("fs");
+const path = require("path");
 
 module.exports = (app) => {
-    var path = __dirname + "/http/";
-    if (fs.existsSync(path)) {
-        var files = fs.readdirSync(path);
+    var dir = __dirname + "/http/";
+    if (fs.existsSync(dir)) {
+        var files = fs.readdirSync(dir);
         for (let file of files) {
-            file = path + file;
+            file = dir + file;
             let stat = fs.statSync(file);
-            if (stat.isFile()) {
+            if (stat.isFile() && path.extname(file) == "js") {
                 require(file)(app);
             }
         }
     } else {
-        fs.mkdirSync(path);
+        fs.mkdirSync(dir);
     }
 };

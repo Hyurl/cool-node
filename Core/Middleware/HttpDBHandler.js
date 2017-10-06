@@ -4,15 +4,17 @@ module.exports = (app) => {
     app.use((req, res, next) => {
         var db;
         Object.defineProperty(req, "db", {
-            set: (v) => {},
+            set: (v) => {
+                db = v;
+                //When the response has been sent, recycle the database 
+                //connection.
+                res.on("finish", () => {
+                    db.recycle();
+                });
+            },
             get: () => {
                 if (db === undefined) {
-                    db = new DB(config.database);
-                    //When the response has been sent, recycle the database 
-                    //connection.
-                    res.on("finish", () => {
-                        db.recycle();
-                    });
+                    req.db = new DB(config.database);
                 }
                 return db;
             }

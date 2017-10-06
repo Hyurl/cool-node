@@ -3,7 +3,7 @@ const fs = require("fs");
 const xml2js = require("xml2js");
 const HttpController = require("../Controllers/HttpController");
 
-function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
+function getController(subdomain, type, URI, req, res, URI2 = [], params = {}) {
     if (!URI.length) {
         throw new Error("404 Not Found!");
     }
@@ -24,7 +24,7 @@ function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
         }
         var instance = new ControllerMap[subdomain][className]({
                 viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`
-            }),
+            }, req),
             methodName1 = URI[0];
         if (methodName1 === undefined) {
             //If only the class name is specified, then try to call index().
@@ -98,7 +98,7 @@ function getController(subdomain, type, URI, res, params = {}, URI2 = []) {
             throw new Error("404 Not Found!");
         }
     } else { //Class doesn't exist, test recursively.
-        return getController(subdomain, type, URI, res, params, URI2);
+        return getController(subdomain, type, URI, req, res, URI2, params);
     }
 }
 
@@ -113,9 +113,9 @@ module.exports = (app) => {
                 uri = path.normalize(uri).replace(/\\/g, "/");
                 if (uri[uri.length - 1] == "/")
                     uri = uri.substring(0, uri.length - 1);
-                var URI = uri.split("/"),
-                    { instance, methodName, params } = getController(req.subdomain, type, URI, res);
-                if (instance.requireAuth && !req.user) {
+                uri = uri.split("/"),
+                    { instance, methodName, params } = getController(req.subdomain, type, uri, req, res);
+                if (instance.requireAuth && !instance.authorized) {
                     if (instance.fallbackTo)
                         res.location(instance.fallbackTo);
                     else
@@ -140,11 +140,10 @@ module.exports = (app) => {
                 }
             }
         }).catch(err => {
-            var code = parseInt(err.message) || 500,
-                controller = new HttpController;
+            var code = parseInt(err.message) || 500;
             //Try to load the error page, if not present, just show the error 
             //message instead.
-            controller.view(code).then(content => {
+            (new HttpController).view(code).then(content => {
                 res.status(code).send(content);
             }).catch(_err => {
                 res.status(code).send(err.message);
