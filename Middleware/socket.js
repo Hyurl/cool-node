@@ -8,7 +8,7 @@ module.exports = (io) => {
         for (let file of files) {
             file = dir + file;
             let stat = fs.statSync(file);
-            if (stat.isFile() && path.extname(file) == "js") {
+            if (stat.isFile() && path.extname(file) == ".js") {
                 require(file)(io);
             }
         }

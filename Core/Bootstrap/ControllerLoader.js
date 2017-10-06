@@ -23,7 +23,7 @@ function loadControllers(subdomain, controllerPath) {
     for (let file of files) {
         let _file = controllerPath + "/" + file;
         let stat = fs.statSync(_file);
-        if (stat.isFile() && file.indexOf(".js")) {
+        if (stat.isFile() && path.extname(file) == ".js") {
             //If file is a js file, load it.
             var name = _file.substring(ROOT.length + 1);
             if (subdomain !== "www") {
