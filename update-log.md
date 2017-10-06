@@ -1,6 +1,6 @@
 **This log starts from version 1.0.4.**
 
-## 1.0.9
+## 1.1.0
 
 <small>(2017-10-6 15:40 UTC 0800)</small>
 
