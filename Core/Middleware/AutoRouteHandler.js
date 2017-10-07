@@ -75,6 +75,7 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
                 // If request method not matching, throw 405 error.
                 throw new Error("405 Method Not Allowed!");
             } else {
+                var _method = method;
                 if (!(method in controller.RESTfulMap) && method != "index")
                     method = type.toLowerCase() + method;
                 return {
@@ -82,7 +83,7 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
                     Class: controller.Class,
                     method,
                     params: getParams(origin, depth + 1),
-                    view: uri == "Home" ? method : `${uri}/${method}`,
+                    view: uri == "Home" ? method : `${uri}/${_method}`,
                 };
             }
         } else {
