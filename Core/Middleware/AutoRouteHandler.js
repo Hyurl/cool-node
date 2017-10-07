@@ -121,6 +121,7 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
 module.exports = (app) => {
     // Listen all URL at base level.
     app.all("*", (req, res) => {
+        req.url = path.normalize(req.url).replace(/\\/g, "/");
         var subdomain = req.subdomain,
             uri = req.url.substring(1).split("?")[0];
         if (uri == "Home" || uri.indexOf("Home/") === 0){
