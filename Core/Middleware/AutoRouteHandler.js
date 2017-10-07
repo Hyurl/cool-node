@@ -121,11 +121,12 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
 module.exports = (app) => {
     // Listen all URL at base level.
     app.all("*", (req, res) => {
-        req.url = path.normalize(req.url).replace(/\\/g, "/");
-        var subdomain = req.subdomain,
-            uri = req.url.substring(1).split("?")[0];
+        var _url = path.normalize(req.url).replace(/\\\\|\\/g, "/"),
+            _path = path.normalize(req.path).replace(/\\\\|\\/g, "/"),
+            subdomain = req.subdomain,
+            uri = _path.substring(1);
         if (uri == "Home" || uri.indexOf("Home/") === 0){
-            res.redirect(301, req.url.replace("/Home", "") || "/");
+            res.redirect(301, _url.replace("/Home", "") || "/");
         }
         // Handle the procedure in a Promise context.
         new Promise((resolve, reject) => {
