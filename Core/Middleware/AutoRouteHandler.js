@@ -21,11 +21,11 @@ for (let subdomain in ControllerMap) {
                 let type;
                 if (prop == "index") {
                     type = "GET";
-                } else if(RESTfulMap[prop]) {
+                } else if (RESTfulMap[prop]) {
                     type = RESTfulMap[prop];
                 } else {
                     for (let _type of Types) {
-                        if (prop.indexOf(_type) === 0){
+                        if (prop.indexOf(_type) === 0) {
                             prop = prop.substring(_type.length);
                             type = _type.toUpperCase();
                             break;
@@ -44,27 +44,27 @@ for (let subdomain in ControllerMap) {
     }
 }
 
-function getParams(uri, depth){
+function getParams(uri, depth) {
     var params = {};
-        uriArr = uri.split("/");
+    uriArr = uri.split("/");
     uriArr.splice(0, depth);
     for (let i = 0; i < uriArr.length; i += 2) {
         let key = uriArr[i],
-            value = uriArr[i+1];
+            value = uriArr[i + 1];
         params[key] = isNaN(value) ? value : Number(value);
     }
     return params;
 }
 
-function getHttpController(subdomain, type, uri, method = "", origin = null, depth = null){
+function getHttpController(subdomain, type, uri, method = "", origin = null, depth = null) {
     if (!HttpControllerMap[subdomain] || Object.keys(HttpControllerMap[subdomain]).length < 1) {
         // If no controller presents, throw 404 error.
         throw new Error("404 Not Found!");
     }
-    if (!uri){
+    if (!uri) {
         uri = "Home";
     }
-    if(depth === null){ // Initiate.
+    if (depth === null) { // Initiate.
         origin = uri;
         depth = uri.split("/").length;
     }
@@ -75,10 +75,12 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
                 // If request method not matching, throw 405 error.
                 throw new Error("405 Method Not Allowed!");
             } else {
+                if (!(method in controller.RESTfulMap) && method != "index")
+                    method = type.toLowerCase() + method;
                 return {
                     name: uri,
                     Class: controller.Class,
-                    method: type.toLowerCase() + method,
+                    method,
                     params: getParams(origin, depth + 1),
                     view: uri == "Home" ? method : `${uri}/${method}`,
                 };
@@ -94,20 +96,24 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
                     view: uri == "Home" ? "index" : `${uri}/index`,
                 };
             } else {
+                var reverseMap = {};
                 for (var method in controller.RESTfulMap) {
-                    if (type == controller.RESTfulMap[method] && controller.methods[method]) {
-                        // Call a RESTful method.
-                        return {
-                            name: uri,
-                            Class: controller.Class,
-                            method,
-                            params: getParams(origin, depth),
-                            view: uri == "Home" ? method : `${uri}/${method}`,
-                        }
+                    reverseMap[controller.RESTfulMap[method]] = method;
+                }
+                if (!reverseMap[type]) {
+                    throw new Error("405 Method Not Allowed!");
+                } else if (!controller.methods[reverseMap[type]]) {
+                    throw new Error("404 Not Found!");
+                } else {
+                    // Call a RESTful method.
+                    return {
+                        name: uri,
+                        Class: controller.Class,
+                        method: reverseMap[type],
+                        params: getParams(origin, depth),
+                        view: uri == "Home" ? method : `${uri}/${method}`,
                     }
                 }
-                // If request method not matching, throw 405 error.
-                throw new Error("405 Method Not Allowed!");
             }
         }
     } else { // No controller matched, try testing recursively.
@@ -125,7 +131,7 @@ module.exports = (app) => {
             _path = path.normalize(req.path).replace(/\\\\|\\/g, "/"),
             subdomain = req.subdomain,
             uri = _path.substring(1);
-        if (uri == "Home" || uri.indexOf("Home/") === 0){
+        if (uri == "Home" || uri.indexOf("Home/") === 0) {
             res.redirect(301, _url.replace("/Home", "") || "/");
         }
         // Handle the procedure in a Promise context.

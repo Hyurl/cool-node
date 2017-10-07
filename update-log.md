@@ -1,5 +1,11 @@
 **This log starts from version 1.0.4.**
 
+## 1.1.2
+
+<small>(2017-10-8 0:42 UTC+0800)</small>
+
+1. Fix a bug in auto-routing handler.
+
 ## 1.1.1
 
 <small>(2017-10-7 17:12 UTC+0800)</small>
