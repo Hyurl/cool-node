@@ -123,6 +123,9 @@ module.exports = (app) => {
     app.all("*", (req, res) => {
         var subdomain = req.subdomain,
             uri = req.url.substring(1).split("?")[0];
+        if (uri == "Home" || uri.indexOf("Home/") === 0){
+            res.redirect(301, req.url.replace("/Home", "") || "/");
+        }
         // Handle the procedure in a Promise context.
         new Promise((resolve, reject) => {
             try {
