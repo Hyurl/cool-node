@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const Controller = require("../Controllers/Controller");
+const HttpController = require("../Controllers/HttpController");
+const SocketController = require("../Controllers/SocketController");
 
 const subdomainMap = {};
 const ControllerMap = {};
@@ -34,12 +36,16 @@ function loadControllers(subdomain, controllerPath) {
             var index = name.lastIndexOf(".");
             name = name.substring(0, index);
             let Class = require(_file);
-            if (Class.prototype instanceof Controller) {
-                if (!ControllerMap[subdomain]) {
-                    ControllerMap[subdomain] = {};
-                }
-                ControllerMap[subdomain][name] = Class;
-            }
+            if (!ControllerMap[subdomain])
+                ControllerMap[subdomain] = {};
+            if (!ControllerMap[subdomain]["http"])
+                ControllerMap[subdomain]["http"] = {};
+            if (!ControllerMap[subdomain]["socket"])
+                ControllerMap[subdomain]["socket"] = {};
+            if (Class.prototype instanceof HttpController)
+                ControllerMap[subdomain]["http"][name] = Class;
+            else if (Class.prototype instanceof SocketController)
+                ControllerMap[subdomain]["socket"][name] = Class;
         } else if (stat.isDirectory()) {
             //If file is a directory, call the function recursively.
             loadControllers(subdomain, _file);

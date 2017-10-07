@@ -29,7 +29,6 @@ require("./Core/Middleware/HttpDBHandler")(app);
 loadCustomHandler(ROOT + "/Middleware/http", app);
 //Load pre-defined middleware.
 require("./Core/Middleware/HttpAuthHandler")(app);
-require("./Core/Middleware/HomeRouteHandler")(app);
 require("./Core/Middleware/AutoRouteHandler")(app);
 
 var httpServer, httpsServer, wsServer, wssServer;

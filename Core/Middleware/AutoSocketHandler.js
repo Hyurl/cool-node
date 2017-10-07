@@ -1,24 +1,22 @@
 const URL = require("url");
-const SocketController = require("../Controllers/SocketController");
-const _ControllerMap = [];
+const SocketControllerMap = {};
 
 //Get all socket controllers.
 for (let subdomain in ControllerMap) {
-    for (let name in ControllerMap[subdomain]) {
-        let proto = ControllerMap[subdomain][name].prototype;
-        if (proto instanceof SocketController) {
-            let props = Object.getOwnPropertyNames(proto);
-            for (let prop of props) {
-                if (prop != "constructor" && (proto[prop] instanceof Function)) {
-                    if (!_ControllerMap[subdomain]) {
-                        _ControllerMap[subdomain] = [];
-                    }
-                    _ControllerMap[subdomain].push({
-                        event: name + "/" + prop,
-                        Class: ControllerMap[subdomain][name],
-                        method: prop
-                    });
+    let controllers = ControllerMap[subdomain]["socket"];
+    for (let name in controllers) {
+        let proto = controllers[name].prototype,
+            props = Object.getOwnPropertyNames(proto);
+        for (let prop of props) {
+            if (prop != "constructor" && (proto[prop] instanceof Function)) {
+                if (!SocketControllerMap[subdomain]) {
+                    SocketControllerMap[subdomain] = [];
                 }
+                SocketControllerMap[subdomain].push({
+                    event: name + "/" + prop,
+                    Class: controllers[name],
+                    method: prop
+                });
             }
         }
     }
@@ -27,12 +25,12 @@ for (let subdomain in ControllerMap) {
 module.exports = (io) => {
     io.use((socket, next) => {
         var subdomain = socket.subdomain;
-        if (!_ControllerMap[subdomain]) {
+        if (!SocketControllerMap[subdomain]) {
             //If no controller presents, close the socket connection.
             return socket.disconnect(true);
         }
         //Bind all socket controllers to the events of underlying socket.
-        for (let controller of _ControllerMap[subdomain]) {
+        for (let controller of SocketControllerMap[subdomain]) {
             let { event, Class, method } = controller;
             socket.on(event, (data) => {
                 //Handle the procedure in a Promise context.

@@ -1,6 +1,6 @@
 {
   "name": "cool-node",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A cool and light weight framework for Node.js, with abilities of auto-routing, cross-protocol, multi-apps, and beyond.",
   "main": "index.js",
   "scripts": {
