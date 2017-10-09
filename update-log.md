@@ -1,5 +1,11 @@
 **This log starts from version 1.0.4.**
 
+## 1.1.5
+
+(2017-10-9 18:11 UTC+0800)
+
+1. Use user-defined User model to make authentication.
+
 ## 1.1.4
 
 (2017-10-9 11:06 UTC+0800)

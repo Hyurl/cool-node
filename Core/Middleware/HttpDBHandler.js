@@ -6,8 +6,8 @@ module.exports = (app) => {
         Object.defineProperty(req, "db", {
             set: (v) => {
                 db = v;
-                //When the response has been sent, recycle the database 
-                //connection.
+                // When the response has been sent, recycle the database 
+                // connection.
                 res.on("finish", () => {
                     db.recycle();
                 });

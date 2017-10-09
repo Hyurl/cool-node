@@ -7,7 +7,7 @@ const renderer = new marked.Renderer();
 
 ejs.delimiter = typeof config.view == "object" ? (config.view.delimiter || "%") : "%";
 
-//Render markdown headings.
+// Render markdown headings.
 renderer.heading = function(text, level) {
     var id = text.replace(/\s/g, '-').match(/[\-0-9a-zA-Z]+/g).join("_");
     return `<h${level} id="${id}">
@@ -19,7 +19,7 @@ renderer.heading = function(text, level) {
 </h${level}>\n`;
 };
 
-//Render markdown codes to be highlighted.
+// Render markdown codes to be highlighted.
 renderer.code = function(code, lang, escaped) {
     return `<pre>
     <code class="lang-${lang} hljs">${hljs.highlightAuto(code).value}</code>
@@ -34,16 +34,16 @@ renderer.code = function(code, lang, escaped) {
  */
 class Controller {
     constructor(options = {}) {
-        //ViewPath and defaultView will be auto set properly by the framework 
-        //when a request event fires.
+        // ViewPath and defaultView will be auto set properly by the framework
+        // when a request event fires.
         this.viewPath = options.viewPath || "App/Views";
         this.defaultView = options.defaultView || "index";
 
-        //If requireAuth is true, when calling the controller unauthorized, a 
-        //401 error will be thrown.
+        // If requireAuth is true, when calling the controller unauthorized, a
+        // 401 error will be thrown.
         this.requireAuth = false;
 
-        //This property indicates whether the operation is authorized.
+        // This property indicates whether the operation is authorized.
         this.authorized = false;
     }
 

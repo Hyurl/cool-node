@@ -6,8 +6,8 @@ module.exports = (io) => {
         Object.defineProperty(socket, "db", {
             set: (v) => {
                 db = v;
-                //When the socket is disconnected, recycle the database 
-                //connection.
+                // When the socket is disconnected, recycle the database 
+                // connection.
                 socket.on("disconnected", () => {
                     db.recycle();
                 });

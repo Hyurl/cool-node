@@ -3,7 +3,7 @@ const path = require("path");
 
 module.exports = (dir, app) => {
     if (fs.existsSync(dir)) {
-        var files = fs.readdirSync(dir);
+        let files = fs.readdirSync(dir);
         for (let file of files) {
             file = dir + "/" + file;
             let stat = fs.statSync(file);

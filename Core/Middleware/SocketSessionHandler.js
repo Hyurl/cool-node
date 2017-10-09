@@ -1,10 +1,10 @@
 module.exports = (io, session) => {
-    //Socket.io middleware for handling session.
+    // Socket.io middleware for handling session.
     io.use((socket, next) => {
-        //Parse session.
+        // Parse session.
         session(socket.handshake, {}, next);
     }).use((socket, next) => {
-        //Handle session in socket, including setting and getting.
+        // Handle session in socket, including setting and getting.
         socket.session = new Proxy(socket.handshake.session, {
             set: (session, key, value) => {
                 session[key] = value;

@@ -1,48 +1,6 @@
 const path = require("path");
-const fs = require("fs");
-const xml2js = require("xml2js");
 const Controller = require("../Controllers/Controller");
-const HttpControllerMap = {};
-const Types = ["connect", "delete", "get", "head", "options", "patch", "post", "put", "trace"];
-
-// Get all HTTP controllers.
-for (let subdomain in ControllerMap) {
-    let controllers = ControllerMap[subdomain]["http"];
-    for (let name in controllers) {
-        if (!HttpControllerMap[subdomain])
-            HttpControllerMap[subdomain] = {};
-        let proto = controllers[name].prototype,
-            props = Object.getOwnPropertyNames(proto),
-            methods = {},
-            instance = new controllers[name],
-            RESTfulMap = instance.RESTfulMap;
-        for (let prop of props) {
-            if (prop != "constructor" && (proto[prop] instanceof Function)) {
-                let type;
-                if (prop == "index") {
-                    type = "GET";
-                } else if (RESTfulMap[prop]) {
-                    type = RESTfulMap[prop];
-                } else {
-                    for (let _type of Types) {
-                        if (prop.indexOf(_type) === 0) {
-                            prop = prop.substring(_type.length);
-                            type = _type.toUpperCase();
-                            break;
-                        }
-                    }
-                }
-                if (type)
-                    methods[prop] = type;
-            }
-        }
-        HttpControllerMap[subdomain][name] = {
-            Class: controllers[name],
-            methods,
-            RESTfulMap
-        };
-    }
-}
+const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
 
 function getParams(uri, depth) {
     var params = {};
@@ -76,7 +34,7 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
                 throw new Error("405 Method Not Allowed!");
             } else {
                 var _method = method;
-                if (!(method in controller.RESTfulMap) && method != "index")
+                if(!(method in controller.RESTfulMap) && method != "index")
                     method = type.toLowerCase() + method;
                 return {
                     name: uri,

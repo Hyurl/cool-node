@@ -1,8 +1,9 @@
-const User = require("modelar/User");
+const UserMap = require("../Bootstrap/UserMap");
 
 module.exports = (app) => {
     app.use((req, res, next) => {
         if (req.session.UID) {
+            var User = UserMap[req.subdomain];
             User.use(req.db).get(req.session.UID).then(user => {
                 req.user = user;
                 next();
