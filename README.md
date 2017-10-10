@@ -1,6 +1,6 @@
 # Cool-Node
 
-**A cool and light weight framework for Node.js, with abilities of** 
+**A cool and light weight web framework for Node.js, with abilities of** 
 **auto-routing, cross-protocol, multi-apps, and beyond.**
 
 ```sh
