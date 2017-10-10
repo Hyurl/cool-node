@@ -34,7 +34,7 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
                 throw new Error("405 Method Not Allowed!");
             } else {
                 var _method = method;
-                if(!(method in controller.RESTfulMap) && method != "index")
+                if (!(method in controller.RESTfulMap) && method != "index")
                     method = type.toLowerCase() + method;
                 return {
                     name: uri,
@@ -116,16 +116,21 @@ module.exports = (app) => {
             }
         }).then(data => {
             if (!res.headersSent && data !== undefined) {
-                var contentType = res.get("Content-Type");
-                // Send data to the client.
-                if (typeof data == "string" || data instanceof Buffer) {
-                    res.send(data);
-                } else if (typeof data == "object" && contentType && contentType.indexOf("text/xml") > -1) {
-                    res.sendAsXML(data);
-                } else if (typeof data != "function") {
-                    res.json(data);
+                var type = res.get("Content-Type"),
+                    xml = /(text|application)\/xml\b/;
+                if (xml.test(type)) {
+                    res.xml(data);
                 } else {
-                    throw new Error("500 Internal Server Error!");
+                    // Send data to the client.
+                    if (data === null) {
+                        res.end();
+                    } else if (typeof data == "string" || data instanceof Buffer) {
+                        res.send(data);
+                    } else if (typeof data != "function") {
+                        res.json(data);
+                    } else {
+                        throw new Error("500 Internal Server Error!");
+                    }
                 }
             }
         }).catch(err => {

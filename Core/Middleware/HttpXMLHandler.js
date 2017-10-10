@@ -1,29 +1,35 @@
 const bodyParser = require('body-parser');
 const xml2js = require("xml2js");
 
+var plain = /text\/plain\b/,
+    xml = /(text|application)\/xml\b/,
+    builder = new xml2js.Builder({ cdata: true });
+
 module.exports = (app) => {
     app.use(bodyParser.text({
         type: (req) => {
             // Parse plain/XML.
-            var converts = ["plain", "xml"],
-                type = req.headers['content-type'];
-            type = type && type.match(/text\/(\S+)\b/)[1];
-            return converts.includes(type);
+            var type = req.headers['content-type'];
+            return plain.test(type) || xml.test(type);
         }
     })).use((req, res, next) => {
         // Add a method on response object, used for sending XML to the client.
-        res.sendAsXML = (data) => {
-            if (typeof data == "object") {
-                res.setHeader("Content-Type", "text/xml; charset=utf-8");
-                var builder = new xml2js.Builder({ cdata: true });
-                res.send(builder.buildObject(data));
+        res.xml = (data) => {
+            if (!res.get("Content-Type")) {
+                res.type("xml");
+            }
+            if (data !== null && data !== undefined) {
+                if (data[0] != "<" && data[data.length - 1] != ">") {
+                    res.send(builder.buildObject(data));
+                } else {
+                    res.send(data);
+                }
             } else {
                 res.end();
             }
         };
         // Parse XML request body.
-        var type = req.headers['content-type']
-        if (type && type.indexOf("text/xml") > -1) {
+        if (xml.test(req.headers['content-type'])) {
             xml2js.parseString(req.body, {
                 ignoreAttrs: true,
                 async: true,

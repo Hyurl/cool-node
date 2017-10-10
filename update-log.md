@@ -1,5 +1,12 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.1
+
+(2017-10-11 1:41 UTC+0800)
+
+1. When return `null` in a HttpController, send response with no body.
+2. More flexible when dealing with XML.
+
 ## 1.2.0 [Important]
 
 (2017-10-10 16:45 UTC+0800)
