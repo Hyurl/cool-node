@@ -19,9 +19,7 @@ module.exports = (app) => {
                 res.type("xml");
             }
             if (data !== null && data !== undefined) {
-                if (typeof data == "object") {
-                    res.send(builder.buildObject(data));
-                } else if (typeof data == "string") {
+                if (typeof data == "string") {
                     if (data[0] != "<" || data[data.length - 1] != ">") {
                         res.send(builder.buildObject(data));
                     } else {

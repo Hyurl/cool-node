@@ -2,7 +2,7 @@
 
 ## 1.2.1
 
-(2017-10-11 1:41 UTC+0800)
+(2017-10-11 2:12 UTC+0800)
 
 1. When return `null` or `undefined` in a HttpController, send response with 
     no body.
