@@ -115,14 +115,14 @@ module.exports = (app) => {
                 reject(err);
             }
         }).then(data => {
-            if (!res.headersSent && data !== undefined) {
+            if (!res.headersSent) {
                 var type = res.get("Content-Type"),
                     xml = /(text|application)\/xml\b/;
                 if (xml.test(type)) {
                     res.xml(data);
                 } else {
                     // Send data to the client.
-                    if (data === null) {
+                    if (data === null || data === undefined) {
                         res.end();
                     } else if (typeof data == "string" || data instanceof Buffer) {
                         res.send(data);
