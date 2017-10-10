@@ -1,1 +1,1 @@
-module.exports = require("../../Core/Controllers/HttpController");
+module.exports = require("cool-node/Core/Controllers/HttpController");

@@ -1,1 +1,1 @@
-module.exports = require("../../Core/Controllers/SocketController");
+module.exports = require("cool-node/Core/Controllers/SocketController");

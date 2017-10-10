@@ -1,1 +1,1 @@
-module.exports = require("../../Core/Models/Model");
+module.exports = require("modelar/Model");

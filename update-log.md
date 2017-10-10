@@ -1,5 +1,11 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.0 [Important]
+
+(2017-10-10 16:45 UTC+0800)
+
+1. Change the structure of the project, no need to copy all files any more.
+
 ## 1.1.5
 
 (2017-10-9 18:11 UTC+0800)
