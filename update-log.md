@@ -1,5 +1,12 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.2
+
+(2017-10-11 2:12 UTC+0800)
+
+1. If a controller method name begins with `_`, then it cannot be accessed by 
+    a client.
+
 ## 1.2.1
 
 (2017-10-11 2:12 UTC+0800)

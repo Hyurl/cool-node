@@ -9,7 +9,8 @@ for (let subdomain in ControllerMap) {
         let proto = controllers[name].prototype,
             props = Object.getOwnPropertyNames(proto);
         for (let prop of props) {
-            if (prop != "constructor" && (proto[prop] instanceof Function)) {
+            if (prop != "constructor" && prop.indexOf("_") !== 0 &&
+                (proto[prop] instanceof Function)) {
                 if (!SocketControllerMap[subdomain]) {
                     SocketControllerMap[subdomain] = [];
                 }
