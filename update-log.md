@@ -1,5 +1,11 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.3
+
+(2017-10-12 22:50 UTC+0800)
+
+1. More flexible on WebSocket server, and user settings for Socket.io.
+
 ## 1.2.2
 
 (2017-10-11 2:12 UTC+0800)

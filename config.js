@@ -15,7 +15,14 @@ module.exports = {
                 key: "",
                 cert: "",
             }
-        }
+        },
+        socket: { // Settings for Socket.io.
+            autoStart: true,
+            options: {
+                pingTimeout: 5000,
+                pingInterval: 5000,
+            },
+        },
     },
     database: { // Settings for Modelar.
         type: "mysql",

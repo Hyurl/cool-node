@@ -23,7 +23,7 @@ global.config = require("cool-node/config");
 if (fs.existsSync(ROOT + "/config.js")) {
     // Load user-defined configurations.
     var config = require(ROOT + "/config.js");
-    global.config = Object.assign(global.config, config);
+    global.config = Object.assign({}, global.config, config);
 }
 
 module.exports = require("cool-node/Core/Bootstrap");

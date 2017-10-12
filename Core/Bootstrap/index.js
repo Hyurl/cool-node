@@ -61,7 +61,7 @@ if (config.server.https.port) {
 
 // Start WebSocket server.
 const SocketIO = require("socket.io");
-var applySocketMiddleware = (io) => {
+var initWSServer = (io) => {
     // Handle subdomain requests.
     require("../Middleware/SocketSubdomainHandler")(io);
     // Handle sessions.
@@ -74,15 +74,23 @@ var applySocketMiddleware = (io) => {
     require("../Middleware/SocketAuthHandler")(io);
     require("../Middleware/AutoSocketHandler")(io);
 };
-if (!httpsServer || !config.server.https.forceRedirect) {
-    // Listen WS protocol.
-    wsServer = SocketIO(httpServer);
-    applySocketMiddleware(wsServer);
+
+if(!config.server.socket){
+    config.server.socket = require("../../config").server.socket || {autoStart: true};
 }
-if (httpsServer) {
-    // Listen WSS protocol.
-    wssServer = SocketIO(httpsServer);
-    applySocketMiddleware(wssServer);
+
+if (config.server.socket.autoStart) {
+    if (!httpsServer || !config.server.https.forceRedirect) {
+        // Listen WS protocol.
+        wsServer = SocketIO(httpServer, config.server.socket.options);
+        initWSServer(wsServer);
+    }
+
+    if (httpsServer) {
+        // Listen WSS protocol.
+        wssServer = SocketIO(httpsServer, config.server.socket.options);
+        initWSServer(wssServer);
+    }
 }
 
 global.wsServer = wsServer;
@@ -93,5 +101,6 @@ module.exports = {
     httpServer,
     httpsServer,
     wsServer,
-    wssServer
+    wssServer,
+    initWSServer
 };
