@@ -53,19 +53,23 @@ class HttpController extends Controller {
     constructor(options = {}, req = null) {
         super(options);
 
-        // This property carries the information of RESTful methods. each 
-        // pair corresponding a method name and a request type.
-        this.RESTfulMap = {
+        // If fallbackTo is set, when unauthorized, fallback to the given URL.
+        this.fallbackTo = "";
+
+        this.authorized = req && req.user !== null;
+    }
+
+    /**
+     * This property carries the information of RESTful methods. each pair 
+     * corresponding a method name and a request type.
+     */
+    get RESTfulMap() {
+        return {
             get: "GET",
             create: "POST",
             update: "PATCH",
             delete: "DELETE",
         };
-
-        // If fallbackTo is set, when unauthorized, fallback to the given URL.
-        this.fallbackTo = "";
-
-        this.authorized = req && req.user !== null;
     }
 }
 

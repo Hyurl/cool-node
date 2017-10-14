@@ -9,7 +9,14 @@ ejs.delimiter = typeof config.view == "object" ? (config.view.delimiter || "%") 
 
 // Render markdown headings.
 renderer.heading = function(text, level) {
-    var id = text.replace(/\s/g, '-').match(/[\-0-9a-zA-Z]+/g).join("_");
+    var isLatin = Buffer.byteLength(text) == text.length,
+        _text = text.replace(/\s/g, '-');
+    if (isLatin) {
+        var matches = _text.match(/[\-0-9a-zA-Z]+/g),
+            id = matches ? matches.join("_") : _text.replace(/[~`!@#\$%\^&\*\(\)\+=\{\}\[\]\|:"'<>,\.\?\/]/g, "_");
+    } else {
+        var id = _text.replace(/[~`!@#\$%\^&\*\(\)\+=\{\}\[\]\|:"'<>,\.\?\/]/g, "_");
+    }
     return `<h${level} id="${id}">
     <a class="heading-anchor" href="#${id}">
         <svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16">
@@ -108,8 +115,12 @@ class Controller {
                 if (err) {
                     reject(err);
                 } else {
-                    content = marked(content, { renderer: renderer });
-                    resolve(content);
+                    try {
+                        content = marked(content, { renderer: renderer });
+                        resolve(content);
+                    } catch (err) {
+                        reject(err);
+                    }
                 }
             });
         });

@@ -98,8 +98,9 @@ module.exports = (app) => {
             try {
                 if (uri == "favicon.ico") // Filter favicon.
                     throw new Error("404 Not Found!");
-                var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri),
-                    instance = new Class({
+                var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri);
+                req.params = params;
+                var instance = new Class({
                         viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                         defaultView: view
                     }, req);
@@ -109,7 +110,6 @@ module.exports = (app) => {
                     else
                         throw new Error("401 Unauthorized!");
                 }
-                req.params = params;
                 resolve(instance[method](req, res));
             } catch (err) {
                 reject(err);

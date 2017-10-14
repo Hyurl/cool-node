@@ -1,5 +1,12 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.4
+
+(2017-10-14 10:20 UTC+0800)
+
+1. Fix some bugs.
+2. `controller.RESTfulMap` is set by a setter since this version.
+
 ## 1.2.3
 
 (2017-10-12 22:50 UTC+0800)

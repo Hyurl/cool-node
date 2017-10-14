@@ -22,8 +22,7 @@ for (let subdomain in ControllerMap) {
         let proto = controllers[name].prototype,
             props = Object.getOwnPropertyNames(proto),
             methods = {},
-            instance = new controllers[name],
-            RESTfulMap = instance.RESTfulMap;
+            RESTfulMap = controllers[name].prototype.RESTfulMap;
         for (let prop of props) {
             if (prop != "constructor" && (proto[prop] instanceof Function)) {
                 let type;
