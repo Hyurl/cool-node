@@ -8,7 +8,8 @@ npm install cool-node --save
 ```
 
 Please check out the documentation at 
-[cool-node.hyurl.com](http://cool-node.hyurl.com).
+[cool-node.hyurl.com](http://cool-node.hyurl.com) or 
+[hyurl.github.io/cool-node/](https://hyurl.github.io/cool-node/).
 
 ## Auto-Routing Development
 
