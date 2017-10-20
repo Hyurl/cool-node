@@ -50,13 +50,16 @@ class HttpController extends Controller {
      * @param  {Object}  options  Options for initiation.
      * @param  {ClientRequest}  req  The underlying request object.
      */
-    constructor(options = {}, req = null) {
+    constructor(options = {}, req = null, res = null) {
         super(options);
 
         // If fallbackTo is set, when unauthorized, fallback to the given URL.
         this.fallbackTo = "";
 
         this.authorized = req && req.user !== null;
+
+        // Send data compressed with GZip.
+        this.gzip = true;
     }
 
     /**

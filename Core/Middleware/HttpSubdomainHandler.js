@@ -1,11 +1,20 @@
 module.exports = (app) => {
     app.use((req, res, next) => {
-        var index = req.hostname && req.hostname.indexOf(config.server.host) - 1;
-        if (index > 0) {
-            req.subdomain = req.hostname.substring(0, index);
-        } else {
-            req.subdomain = "www";
+        if (req.hostname) {
+            if (typeof config.server.host == "string") {
+                var hosts = [config.server.host];
+            } else {
+                var hosts = config.server.host;
+            }
+            for (let host of hosts) {
+                let index = req.hostname.indexOf(host);
+                if (index > 0) {
+                    req.subdomain = req.hostname.substring(0, index - 1);
+                    break;
+                }
+            }
         }
+        req.subdomain = req.subdomain || "www";
         next();
     });
 };

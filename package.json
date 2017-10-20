@@ -1,6 +1,6 @@
 {
     "name": "cool-node",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "description": "A cool and light weight web framework for Node.js, with abilities of auto-routing, cross-protocol, multi-apps, and beyond.",
     "main": "index.js",
     "scripts": {
@@ -35,6 +35,8 @@
         "nodemailer": "^4.1.0",
         "qs": "^6.5.1",
         "socket.io": "^2.0.3",
-        "xml2js": "^0.4.19"
+        "string-trimmer": "^1.0.0",
+        "xml2js": "^0.4.19",
+        "zlib": "^1.0.5"
     }
 }

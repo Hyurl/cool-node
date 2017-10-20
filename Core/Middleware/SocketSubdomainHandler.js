@@ -1,11 +1,20 @@
 module.exports = (io) => {
     io.use((socket, next) => {
-        var index = socket.request.headers.host.indexOf(config.server.host) - 1;
-        if (index > 0) {
-            socket.subdomain = socket.request.headers.host.substring(0, index);
-        } else {
-            socket.subdomain = "www";
+        if (socket.hostname) {
+            if (typeof config.server.host == "string") {
+                var hosts = [config.server.host];
+            } else {
+                var hosts = config.server.host;
+            }
+            for (let host of hosts) {
+                let index = socket.hostname.indexOf(host);
+                if (index > 0) {
+                    socket.subdomain = socket.hostname.substring(0, index - 1);
+                    break;
+                }
+            }
         }
+        socket.subdomain = socket.subdomain || "www";
         next();
     });
 };

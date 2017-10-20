@@ -1,6 +1,8 @@
 const path = require("path");
+const zlib = require("zlib");
 const Controller = require("../Controllers/Controller");
 const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
+const initConfig = require("../../config");
 
 function getParams(uri, depth) {
     var params = {};
@@ -96,19 +98,27 @@ module.exports = (app) => {
         // Handle the procedure in a Promise context.
         new Promise((resolve, reject) => {
             try {
-                if (uri == "favicon.ico") // Filter favicon.
+                // Throw 404 if the URL is invalid.
+                var ext = path.extname(uri),
+                    strictURL = config.server.strictURL || initConfig.server.strictURL;
+                if (ext && strictURL.enabled && !strictURL.exception.includes(ext)) {
                     throw new Error("404 Not Found!");
+                }
                 var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri);
                 req.params = params;
                 var instance = new Class({
-                        viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                        defaultView: view
-                    }, req);
+                    viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
+                    defaultView: view
+                }, req, res);
                 if (instance.requireAuth && !instance.authorized) {
                     if (instance.fallbackTo)
                         res.location(instance.fallbackTo);
                     else
                         throw new Error("401 Unauthorized!");
+                }
+                var encoding = req.headers["accept-encoding"].split(",")[0];
+                if (encoding == "gzip" && instance.gzip) {
+                    res.set("Content-Encoding", "gzip");
                 }
                 resolve(instance[method](req, res));
             } catch (err) {
@@ -117,14 +127,23 @@ module.exports = (app) => {
         }).then(data => {
             if (!res.headersSent) {
                 var type = res.get("Content-Type"),
-                    xml = /(text|application)\/xml\b/;
+                    xml = /(text|application)\/xml\b/,
+                    gzip = res.get("Content-Encoding") == "gzip";
                 if (xml.test(type)) {
                     res.xml(data);
                 } else {
                     // Send data to the client.
                     if (data === null || data === undefined) {
                         res.end();
-                    } else if (typeof data == "string" || data instanceof Buffer) {
+                    } else if (typeof data == "string") {
+                        if (gzip) {
+                            data = zlib.gzipSync(data);
+                            res.set("Content-Length", Buffer.byteLength(data));
+                            res.end(data);
+                        } else {
+                            res.send(data);
+                        }
+                    } else if (data instanceof Buffer) {
                         res.send(data);
                     } else if (typeof data != "function") {
                         res.json(data);

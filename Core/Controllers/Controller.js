@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const marked = require("marked");
 const hljs = require("highlightjs");
+const StringTrimmer = require("string-trimmer");
 const renderer = new marked.Renderer();
 
 ejs.delimiter = typeof config.view == "object" ? (config.view.delimiter || "%") : "%";
@@ -17,6 +18,7 @@ renderer.heading = function(text, level) {
     } else {
         var id = _text.replace(/[~`!@#\$%\^&\*\(\)\+=\{\}\[\]\|:"'<>,\.\?\/]/g, "_");
     }
+    id = StringTrimmer.trim(id, "_");
     return `<h${level} id="${id}">
     <a class="heading-anchor" href="#${id}">
         <svg aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16">

@@ -1,5 +1,16 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.5
+
+(2017-10-21 0:18 UTC+0800)
+
+1. Automatically compress data to GZip if supported.
+2. More socket properties for convenience.
+3. Socket methods support more parameters.
+4. HttpController's constructor support a third parameter `res`.
+5. `config.server.host` could be an array for multiple hosts.
+6. Fix a BUG of markdown-view.
+
 ## 1.2.4
 
 (2017-10-14 10:20 UTC+0800)

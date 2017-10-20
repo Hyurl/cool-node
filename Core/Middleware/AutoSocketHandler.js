@@ -10,17 +10,21 @@ module.exports = (io) => {
         // Bind all socket controllers to the events of underlying socket.
         for (let controller of SocketControllerMap[subdomain]) {
             let { event, Class, method } = controller;
-            socket.on(event, (data) => {
+            socket.on(event, (...data) => {
                 // Handle the procedure in a Promise context.
                 new Promise((resolve, reject) => {
-                    var instance = new Class({
-                        viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                        defaultView: event
-                    }, socket);
-                    if (instance.requireAuth && !instance.authorized) {
-                        throw new Error("401 Unauthorized!");
+                    try {
+                        var instance = new Class({
+                            viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
+                            defaultView: event
+                        }, socket);
+                        if (instance.requireAuth && !instance.authorized) {
+                            throw new Error("401 Unauthorized!");
+                        }
+                        resolve(instance[method](...data, socket));
+                    } catch (err) {
+                        reject(err);
                     }
-                    resolve(instance[method](data, socket));
                 }).then(_data => {
                     if (_data !== undefined) {
                         // Send data to the client.

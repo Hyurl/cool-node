@@ -5,7 +5,7 @@ const MemoryStore = require('memorystore')(session);
 // supported options on their official websites.
 module.exports = {
     server: {
-        host: "localhost", // Just for splitting subdomains.
+        host: "localhost", // For splitting subdomains, could be an array.
         port: 80,
         timeout: 30000,
         https: {
@@ -23,6 +23,12 @@ module.exports = {
                 pingInterval: 5000,
             },
         },
+        strictURL: {
+            // If enabled, when visit a link with an extension, but it's not a
+            // file, throw 404.
+            enabled: true,
+            exception: [".html"] // Except for these extensions.
+        }
     },
     database: { // Settings for Modelar.
         type: "mysql",

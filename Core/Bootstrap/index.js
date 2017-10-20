@@ -3,7 +3,18 @@ const bodyParser = require('body-parser');
 const app = express();
 const session = require("express-session")(config.session);
 
-var loadCustomHandler = require("./CustomHandlerLoader");
+var loadCustomHandler = require("./CustomHandlerLoader"),
+    version = require("../../package.json").version,
+    expressVersion = require("express/package.json").version;
+
+// Initial headers.
+app.use((req, res, next) => {
+    res.set({
+        "Server": `Express/${expressVersion} Node.js/${process.version}`,
+        "X-Powered-By": `Cool-Node/${version}`
+    });
+    next();
+})
 
 // Auto-redirect HTTP to HTTPS.
 require("../Middleware/HttpsRedirector")(app);
@@ -62,6 +73,8 @@ if (config.server.https.port) {
 // Start WebSocket server.
 const SocketIO = require("socket.io");
 var initWSServer = (io) => {
+    // Handle properties.
+    require("../Middleware/SocketPropsHandler")(io);
     // Handle subdomain requests.
     require("../Middleware/SocketSubdomainHandler")(io);
     // Handle sessions.
@@ -75,8 +88,8 @@ var initWSServer = (io) => {
     require("../Middleware/AutoSocketHandler")(io);
 };
 
-if(!config.server.socket){
-    config.server.socket = require("../../config").server.socket || {autoStart: true};
+if (!config.server.socket) {
+    config.server.socket = require("../../config").server.socket;
 }
 
 if (config.server.socket.autoStart) {
