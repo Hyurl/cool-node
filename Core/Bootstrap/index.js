@@ -8,13 +8,16 @@ var loadCustomHandler = require("./CustomHandlerLoader"),
     expressVersion = require("express/package.json").version;
 
 // Initial headers.
-app.use((req, res, next) => {
-    res.set({
-        "Server": `Express/${expressVersion} Node.js/${process.version}`,
-        "X-Powered-By": `Cool-Node/${version}`
+app.set("x-powered-by", false);
+if (config.server.showInfo || config.server.showInfo === undefined) {
+    app.use((req, res, next) => {
+        res.set({
+            "Server": `Express/${expressVersion} Node.js/${process.version}`,
+            "X-Powered-By": `Cool-Node/${version}`
+        });
+        next();
     });
-    next();
-})
+}
 
 // Auto-redirect HTTP to HTTPS.
 require("../Middleware/HttpsRedirector")(app);
@@ -42,6 +45,8 @@ var httpServer = null,
     wsServer = null,
     wssServer = null;
 
+var hostname = Array.isArray(config.server.host) ? config.server.host[0] : config.server.host;
+
 // Start HTTP server.
 httpServer = require("http").Server(app);
 httpServer.setTimeout(config.server.timeout || 30000);
@@ -50,9 +55,9 @@ httpServer.listen(config.server.port, (err) => {
         throw err;
         process.exit(1);
     }
-    var host = config.server.host;
-    var port = httpServer.address().port;
-    console.log("HTTP Server started, please visit http://%s:%s.", host, port);
+    var port = httpServer.address().port,
+        host = `${hostname}` + (port != 80 ? `:${port}` : "");
+    console.log("HTTP Server started, please visit http://%s.", host);
 });
 
 if (config.server.https.port) {
@@ -64,9 +69,9 @@ if (config.server.https.port) {
             throw err;
             process.exit(1);
         }
-        var host = config.server.host;
-        var port = httpsServer.address().port;
-        console.log("HTTPS Server started, please visit https://%s:%s.", host, port);
+        var port = httpsServer.address().port,
+            host = `${hostname}` + (port != 443 ? `:${port}` : "");
+        console.log("HTTPS Server started, please visit https://%s.", host);
     });
 }
 
@@ -89,7 +94,7 @@ var initWSServer = (io) => {
 };
 
 if (!config.server.socket) {
-    config.server.socket = require("../../config").server.socket;
+    config.server.socket = require("../../config").server.socket || { autoStart: true };
 }
 
 if (config.server.socket.autoStart) {
