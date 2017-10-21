@@ -2,7 +2,7 @@
 
 ## 1.2.5
 
-(2017-10-21 0:18 UTC+0800)
+(2017-10-21 12:00 UTC+0800)
 
 1. Automatically compress data to GZip if supported.
 2. More socket properties for convenience.
