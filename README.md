@@ -1,7 +1,8 @@
 # Cool-Node
 
-**A cool and light weight web framework for Node.js, with abilities of** 
-**auto-routing, cross-protocol, multi-apps, and beyond.**
+**A cool and light weight web framework for Node.js to build strong**
+**applications, with abilities of auto-routing, cross-protocol, multi-apps,**
+**and beyond.**
 
 ```sh
 npm install cool-node --save

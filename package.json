@@ -1,7 +1,7 @@
 {
     "name": "cool-node",
     "version": "1.2.5",
-    "description": "A cool and light weight web framework for Node.js, with abilities of auto-routing, cross-protocol, multi-apps, and beyond.",
+    "description": "A cool and light weight web framework for Node.js to build strong applications, with abilities of auto-routing, cross-protocol, multi-apps, and beyond.",
     "main": "index.js",
     "scripts": {
         "start": "node index.js"
