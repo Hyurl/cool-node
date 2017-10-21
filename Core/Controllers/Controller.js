@@ -155,7 +155,7 @@ class Controller {
     /**
      * Sends failed action results to the response context.
      * 
-     * @param  {String}  msg  A message the indicates the failed reason.
+     * @param  {String}  msg  A message that indicates the failed reason.
      * 
      * @param  {Number}  code  [optional] A code represented the status of the
      *  action.
@@ -163,7 +163,8 @@ class Controller {
      * @return {Promise} Returns a Promise, and the only argument passed to 
      *  the callback of `then()` is a object which carries these information:
      *  - `success` Indicates if the action is successful, always false.
-     *  - `msg` The same `msg` given above.
+     *  - `msg` The same `msg` given above, deprecated.
+     *  - `error` The error message, same as `msg`.
      *  - `code` The same `code` given above.
      */
     error(msg, code = 0) {
@@ -171,6 +172,7 @@ class Controller {
             resolve({
                 success: false,
                 msg,
+                error: msg,
                 code,
             });
         });
