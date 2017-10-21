@@ -2,14 +2,14 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const app = express();
 const session = require("express-session")(config.session);
+const version = require("../../package.json").version;
 
 var loadCustomHandler = require("./CustomHandlerLoader");
 
 // Initial headers.
 app.set("x-powered-by", false);
 if (config.server.showInfo || config.server.showInfo === undefined) {
-    var version = require("../../package.json").version,
-        expressVersion = require("express/package.json").version;
+    var expressVersion = require("express/package.json").version;
     app.use((req, res, next) => {
         res.set({
             "Server": `Express/${expressVersion} Node.js/${process.version}`,
@@ -115,6 +115,7 @@ global.wsServer = wsServer;
 global.wssServer = wssServer;
 
 module.exports = {
+    version,
     app,
     httpServer,
     httpsServer,
