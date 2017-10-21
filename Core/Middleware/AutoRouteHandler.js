@@ -88,6 +88,7 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
 module.exports = (app) => {
     // Listen all URL at base level.
     app.all("*", (req, res) => {
+        res.gzip = false;
         var _url = path.normalize(req.url).replace(/\\\\|\\/g, "/"),
             _path = path.normalize(req.path).replace(/\\\\|\\/g, "/"),
             subdomain = req.subdomain,
@@ -118,7 +119,7 @@ module.exports = (app) => {
                 }
                 var encoding = req.headers["accept-encoding"].split(",")[0];
                 if (encoding == "gzip" && instance.gzip) {
-                    res.set("Content-Encoding", "gzip");
+                    res.gzip = true;
                 }
                 resolve(instance[method](req, res));
             } catch (err) {
@@ -127,8 +128,7 @@ module.exports = (app) => {
         }).then(data => {
             if (!res.headersSent) {
                 var type = res.get("Content-Type"),
-                    xml = /(text|application)\/xml\b/,
-                    gzip = res.get("Content-Encoding") == "gzip";
+                    xml = /(text|application)\/xml\b/;
                 if (xml.test(type)) {
                     res.xml(data);
                 } else {
@@ -136,8 +136,10 @@ module.exports = (app) => {
                     if (data === null || data === undefined) {
                         res.end();
                     } else if (typeof data == "string") {
-                        if (gzip) {
+                        if (res.gzip) {
+                            // Send compressed data.
                             data = zlib.gzipSync(data);
+                            res.set("Content-Encoding", "gzip");
                             res.set("Content-Length", Buffer.byteLength(data));
                             res.end(data);
                         } else {
