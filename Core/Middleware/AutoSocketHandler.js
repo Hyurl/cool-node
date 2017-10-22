@@ -36,8 +36,9 @@ module.exports = (io) => {
                     // If any error occurs, send a warning to the client.
                     socket.emit(event, {
                         success: false,
-                        msg: err.message,
                         code: parseInt(err.message) || 500,
+                        error: err.message,
+                        msg: err.message, // deprecated
                     });
                     // Recycle the database connection.
                     socket.db.recycle();

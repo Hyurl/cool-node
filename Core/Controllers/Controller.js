@@ -134,22 +134,19 @@ class Controller {
      * @param  {Any}  data  The data that needs to be send.
      * 
      * @param  {Number}  code  [optional] A code represented the status of the
-     *  action.
+     *  action, default is `200`.
      * 
-     * @return {Promise} Returns a Promise, and the only argument passed to 
-     *  the callback of `then()` is a object which carries these information:
+     * @return {Object} An object that carries these information:
      *  - `success` Indicates if the action is successful, always true.
-     *  - `data` The same `data` given above.
      *  - `code` The same `code` given above.
+     *  - `data` The same `data` given above.
      */
-    success(data, code = 0) {
-        return new Promise(resolve => {
-            resolve({
-                success: true,
-                data,
-                code,
-            });
-        });
+    success(data, code = 200) {
+        return {
+            success: true,
+            code,
+            data,
+        };
     }
 
     /**
@@ -158,24 +155,21 @@ class Controller {
      * @param  {String}  msg  A message that indicates the failed reason.
      * 
      * @param  {Number}  code  [optional] A code represented the status of the
-     *  action.
+     *  action, default is `500`.
      * 
-     * @return {Promise} Returns a Promise, and the only argument passed to 
-     *  the callback of `then()` is a object which carries these information:
+     * @return {Object} An object that carries these information:
      *  - `success` Indicates if the action is successful, always false.
-     *  - `msg` The same `msg` given above, deprecated.
-     *  - `error` The error message, same as `msg`.
      *  - `code` The same `code` given above.
+     *  - `error` The error message, same as `msg`.
+     *  - `msg` The same `msg` given above, deprecated.
      */
-    error(msg, code = 0) {
-        return new Promise(resolve => {
-            resolve({
-                success: false,
-                msg,
-                error: msg,
-                code,
-            });
-        });
+    error(msg, code = 500) {
+        return {
+            success: false,
+            code,
+            error: msg,
+            msg,
+        };
     }
 }
 
