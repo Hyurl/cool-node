@@ -12,6 +12,9 @@ Please check out the documentation at
 [cool-node.hyurl.com](http://cool-node.hyurl.com) or 
 [hyurl.github.io/cool-node/](https://hyurl.github.io/cool-node/).
 
+If you're interested at new features in the next version, please visit 
+[projects](https://github.com/Hyurl/cool-node/projects) for agendas.
+
 ## Auto-Routing Development
 
 Remember when you were using the node.js internal server or Express, or other 
