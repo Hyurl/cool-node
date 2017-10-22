@@ -13,7 +13,7 @@ Please check out the documentation at
 [hyurl.github.io/cool-node/](https://hyurl.github.io/cool-node/).
 
 If you're interested at new features in the next version, please visit 
-[Projects](https://github.com/Hyurl/cool-node/projects) for agendas.
+[Projects](https://github.com/Hyurl/cool-node/projects) for plans.
 
 ## Auto-Routing Development
 
