@@ -152,7 +152,8 @@ class Controller {
     /**
      * Sends failed action results to the response context.
      * 
-     * @param  {String}  msg  A message that indicates the failed reason.
+     * @param  {String|Error}  msg  A message or an Error that indicates the 
+     *  failed reason.
      * 
      * @param  {Number}  code  [optional] A code represented the status of the
      *  action, default is `500`.
@@ -164,6 +165,7 @@ class Controller {
      *  - `msg` The same `msg` given above, deprecated.
      */
     error(msg, code = 500) {
+        msg = msg instanceof Error ? msg.message : msg;
         return {
             success: false,
             code,
