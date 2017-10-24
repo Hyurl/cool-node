@@ -4,6 +4,7 @@ const path = require("path");
 const marked = require("marked");
 const hljs = require("highlightjs");
 const StringTrimmer = require("string-trimmer");
+const Logger = require("../Tools/Logger");
 const renderer = new marked.Renderer();
 
 ejs.delimiter = typeof config.view == "object" ? (config.view.delimiter || "%") : "%";
@@ -42,11 +43,17 @@ renderer.code = function(code, lang, escaped) {
  * events.
  */
 class Controller {
+    /**
+     * Creates a controller inistance.
+     * 
+     * @param  {Object}  options  Options for initiation.
+     */
     constructor(options) {
-        // ViewPath and defaultView will be auto set properly by the framework
-        // when a request event fires.
+        // ViewPath, defaultView and action will be auto set properly by the 
+        // framework when a request event fires.
         this.viewPath = options.viewPath || "App/Views";
         this.defaultView = options.defaultView || "index";
+        this.action = options.action || "";
 
         // If requireAuth is true, when calling the controller unauthorized, a
         // 401 error will be thrown.
@@ -54,6 +61,13 @@ class Controller {
 
         // This property indicates whether the operation is authorized.
         this.authorized = false;
+
+        // Configurations for Logger tool.
+        this.logConfig = {
+            filename: "",
+            fileSize: 0,
+            mailTo: "",
+        }
     }
 
     /**
@@ -172,6 +186,19 @@ class Controller {
             error: msg,
             msg,
         };
+    }
+
+    /**
+     * Gets the logger instance.
+     */
+    get logger() {
+        if (!this.__logger) {
+            var filename = this.logConfig.filename || path.dirname(`${ROOT}/${this.viewPath}`) + "/Logs/cool-node.log";
+            this.__logger = new Logger(filename, this.action);
+            this.__logger.fileSize = this.logConfig.fileSize || 1024 * 1024 * 1024;
+            this.__logger.mailTo = this.logConfig.mailTo;
+        }
+        return this.__logger;
     }
 }
 

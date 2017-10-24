@@ -46,7 +46,7 @@ const Controller = require("./Controller");
  */
 class HttpController extends Controller {
     /**
-     * Create a new HTTP controller instance.
+     * Creates a new HTTP controller instance.
      * 
      * You can pass a fourth parameter `next` to the constructor, if such a 
      * parameter is defined, then the constructor can handle asynchronous 

@@ -25,7 +25,7 @@ const Controller = require("./Controller");
  */
 class SocketController extends Controller {
     /**
-     * Create a new socket controller instance.
+     * Creates a new socket controller instance.
      * 
      * You can pass a third parameter `next` to the constructor, if such a 
      * parameter is defined, then the constructor can handle asynchronous 

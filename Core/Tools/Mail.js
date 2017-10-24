@@ -5,7 +5,7 @@ const Nodemailer = require("nodemailer");
  */
 class Mail {
     /**
-     * Create a new Mail instance with specified options or a subject.
+     * Creates a new Mail instance with specified options or a subject.
      * 
      * @param {String|Object} options 
      */

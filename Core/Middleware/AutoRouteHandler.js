@@ -108,7 +108,8 @@ module.exports = (app) => {
                 var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri),
                     options = {
                         viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                        defaultView: view
+                        defaultView: view,
+                        action: name + "." + method
                     };
                 req.params = params;
 

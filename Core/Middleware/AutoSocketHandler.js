@@ -1,3 +1,4 @@
+const path = require("path");
 const SocketControllerMap = require("../Bootstrap/SocketControllerMap");
 
 module.exports = (io) => {
@@ -24,7 +25,8 @@ module.exports = (io) => {
 
                         var options = {
                             viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                            defaultView: event
+                            defaultView: event,
+                            action: path.dirname(event) + "." + method
                         };
                         if (Class.prototype.constructor.length === 3) {
                             new Class(options, socket, next);
