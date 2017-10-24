@@ -3,6 +3,7 @@ const zlib = require("zlib");
 const path = require("path");
 const util = require("util");
 const Mail = require("./Mail");
+const { EOL } = require("os");
 
 class Logger {
     /**
@@ -43,7 +44,7 @@ class Logger {
 
         // Get log contents.
         msg = util.format(...msg);
-        var logStr = `[${timeStr}] [${level}] ${this.action} - ${msg}\n`;
+        var logStr = `[${timeStr}] [${level}] ${this.action} - ${msg}${EOL}`;
 
         if (fs.existsSync(this.filename)) {
             // File exists, test file size.
