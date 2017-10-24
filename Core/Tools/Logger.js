@@ -92,12 +92,12 @@ class Logger {
     }
 
     /**
-     * Outputs a message to the log file at NORMAL level.
+     * Outputs a message to the log file at LOG level.
      * 
      * @param {String} msg Log message.
      */
     log(...msg) {
-        return this.__output("NORMAL", ...msg);
+        return this.__output("LOG", ...msg);
     }
 
     /**
