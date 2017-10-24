@@ -1,10 +1,10 @@
 const Controller = require("./Controller");
 
 /**
- * SocketController manages requests from a socket.io client.
+ * SocketController manages requests from a Socket.io client.
  * 
  * When you define a method in a SocketController, it will be called 
- * automatically when a socket.io event fires. All methods in a 
+ * automatically when a Socket.io event fires. All methods in a 
  * SocketController accept two parameters in the following sequence: 
  * 
  * - `data` sent by the client;
@@ -27,13 +27,18 @@ class SocketController extends Controller {
     /**
      * Create a new socket controller instance.
      * 
+     * You can pass a third parameter `next` to the constructor, if such a 
+     * parameter is defined, then the constructor can handle asynchronous 
+     * actions. And at where you want to call the real method, use 
+     * `next(this);` to call it.
+     * 
      * @param  {Object}  options  Options for initiation.
      * @param  {Socket}  socket  The underlying socket object.
      */
-    constructor(options = {}, socket = null){
+    constructor(options, socket) {
         super(options);
 
-        this.authorized = socket && socket.user !== null;
+        this.authorized = socket.user !== null;
     }
 }
 

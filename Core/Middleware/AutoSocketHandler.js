@@ -14,14 +14,24 @@ module.exports = (io) => {
                 // Handle the procedure in a Promise context.
                 new Promise((resolve, reject) => {
                     try {
-                        var instance = new Class({
+                        function next(instance) {
+                            instance = instance || this;
+                            if (instance.requireAuth && !instance.authorized) {
+                                throw new Error("401 Unauthorized!");
+                            }
+                            resolve(instance[method](...data, socket));
+                        }
+
+                        var options = {
                             viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                             defaultView: event
-                        }, socket);
-                        if (instance.requireAuth && !instance.authorized) {
-                            throw new Error("401 Unauthorized!");
+                        };
+                        if (Class.prototype.constructor.length === 3) {
+                            new Class(options, socket, next);
+                        } else {
+                            var instance = new Class(options, socket);
+                            next(instance);
                         }
-                        resolve(instance[method](...data, socket));
                     } catch (err) {
                         reject(err);
                     }

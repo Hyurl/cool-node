@@ -105,23 +105,34 @@ module.exports = (app) => {
                 if (ext && strictURL.enabled && !strictURL.exception.includes(ext)) {
                     throw new Error("404 Not Found!");
                 }
-                var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri);
+                var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri),
+                    options = {
+                        viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
+                        defaultView: view
+                    };
                 req.params = params;
-                var instance = new Class({
-                    viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                    defaultView: view
-                }, req, res);
-                if (instance.requireAuth && !instance.authorized) {
-                    if (instance.fallbackTo)
-                        res.location(instance.fallbackTo);
-                    else
-                        throw new Error("401 Unauthorized!");
+
+                function next(instance) {
+                    instance = instance || this;
+                    if (instance.requireAuth && !instance.authorized) {
+                        if (instance.fallbackTo)
+                            res.location(instance.fallbackTo);
+                        else
+                            throw new Error("401 Unauthorized!");
+                    }
+                    var encoding = req.headers["accept-encoding"].split(",")[0];
+                    if (encoding == "gzip" && instance.gzip) {
+                        res.gzip = true;
+                    }
+                    resolve(instance[method](req, res));
                 }
-                var encoding = req.headers["accept-encoding"].split(",")[0];
-                if (encoding == "gzip" && instance.gzip) {
-                    res.gzip = true;
+
+                if (Class.prototype.constructor.length === 4) {
+                    new Class(options, req, res, next);
+                } else {
+                    var instance = new Class(options, req, res);
+                    next(instance);
                 }
-                resolve(instance[method](req, res));
             } catch (err) {
                 reject(err);
             }

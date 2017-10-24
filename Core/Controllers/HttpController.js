@@ -17,13 +17,14 @@ const Controller = require("./Controller");
  * - `req` the underlying request;
  * - `res` the underlying response;
  * 
- * You may `return` some data from the method, when the method is called by a 
- * HTTP request, it will be handled in a Promise constructor, so you can do 
- * what ever you want in the method, just remember to put the code in a 
- * Promise if you are doing asynchronous actions.
+ * You may `return` some data inside the method, when the method is called by 
+ * a HTTP request, they will be automatically sent to the client. Actions will
+ * be handled in a Promise constructor, so you can do what ever you want in 
+ * the method, just remember to put the code in a Promise if you are doing 
+ * asynchronous operations.
  * 
  * If you want to send a response manually, you can call the `res` that passed
- * into the method, no more data will be sent automatically after sending one.
+ * into the method, no more data will be sent after sending one.
  * 
  * If you define a method `index()` in the controller, this method will be 
  * called if the request doesn't explicitly specify a action, meaning you 
@@ -41,22 +42,28 @@ const Controller = require("./Controller");
  * - `update` listen PATCH;
  * - `delete` listen DELETE;
  * 
- * you can change them by reassigning the property `RESTfulMap`.
+ * you can change them by reassigning the setter property `RESTfulMap`.
  */
 class HttpController extends Controller {
     /**
      * Create a new HTTP controller instance.
      * 
+     * You can pass a fourth parameter `next` to the constructor, if such a 
+     * parameter is defined, then the constructor can handle asynchronous 
+     * actions. And at where you want to call the real method, use 
+     * `next(this);` to call it.
+     * 
      * @param  {Object}  options  Options for initiation.
      * @param  {ClientRequest}  req  The underlying request object.
+     * @param  {ServerResponse}  res  The underlying response object.
      */
-    constructor(options = {}, req = null, res = null) {
+    constructor(options, req, res) {
         super(options);
 
         // If fallbackTo is set, when unauthorized, fallback to the given URL.
         this.fallbackTo = "";
 
-        this.authorized = req && req.user !== null;
+        this.authorized = req.user !== null;
 
         // Send data compressed with GZip.
         this.gzip = true;

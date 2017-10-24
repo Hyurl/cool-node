@@ -42,7 +42,7 @@ renderer.code = function(code, lang, escaped) {
  * events.
  */
 class Controller {
-    constructor(options = {}) {
+    constructor(options) {
         // ViewPath and defaultView will be auto set properly by the framework
         // when a request event fires.
         this.viewPath = options.viewPath || "App/Views";
