@@ -26,7 +26,8 @@ module.exports = (io) => {
                         var options = {
                             viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                             defaultView: event,
-                            action: path.dirname(event) + "." + method
+                            action: path.dirname(event) + "." + method,
+                            actionName: method
                         };
                         if (Class.prototype.constructor.length === 3) {
                             new Class(options, socket, next);

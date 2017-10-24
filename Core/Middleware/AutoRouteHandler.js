@@ -109,7 +109,8 @@ module.exports = (app) => {
                     options = {
                         viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                         defaultView: view,
-                        action: name + "." + method
+                        action: name + "." + method,
+                        actionName: method
                     };
                 req.params = params;
 

@@ -49,11 +49,14 @@ class Controller {
      * @param  {Object}  options  Options for initiation.
      */
     constructor(options) {
-        // ViewPath, defaultView and action will be auto set properly by the 
-        // framework when a request event fires.
+        // ViewPath, defaultView, action and actionName will be auto set 
+        // properly by the framework when a request event fires.
         this.viewPath = options.viewPath || "App/Views";
         this.defaultView = options.defaultView || "index";
-        this.action = options.action || "";
+        // Full called method name (including class path).
+        this.action = options.action;
+        // Called method name.
+        this.actionName = options.actionName;
 
         // If requireAuth is true, when calling the controller unauthorized, a
         // 401 error will be thrown.
