@@ -42,6 +42,10 @@ class Logger {
         ms = ms >= 100 ? ms : (ms >= 10 ? `0${ms}` : `00${ms}`);
         var timeStr = `${Y}-${m}-${d} ${H}:${i}:${s}.${ms}`;
 
+        // Convert msg.
+        msg = msg.map(item=>{
+            return item instanceof Error ? item.message : item;
+        });
         // Get log contents.
         msg = util.format(...msg);
         var logStr = `[${timeStr}] [${level}] ${this.action} - ${msg}${EOL}`;
