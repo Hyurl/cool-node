@@ -67,6 +67,10 @@ class HttpController extends Controller {
 
         // Send data compressed with GZip.
         this.gzip = true;
+
+        // An array defines what parameters that the controller accepts, null 
+        // means disabled and accepts all.
+        this.urlParams = null;
     }
 
     /**

@@ -5,6 +5,11 @@ const User = require("../../Models/User");
  * An example of HttpController using RESTful API.
  */
 module.exports = class extends HttpController {
+    constructor(options, req, res) {
+        super(options, req, res);
+        this.urlParams = ["id"];
+    }
+
     /** e.g POST /Http/User */
     create(req) {
         return User.use(req.db).insert(req.body);

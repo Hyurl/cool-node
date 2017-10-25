@@ -43,7 +43,7 @@ class Logger {
         var timeStr = `${Y}-${m}-${d} ${H}:${i}:${s}.${ms}`;
 
         // Convert msg.
-        msg = msg.map(item=>{
+        msg = msg.map(item => {
             return item instanceof Error ? item.message : item;
         });
         // Get log contents.
@@ -60,7 +60,7 @@ class Logger {
                     var host = Array.isArray(config.server.host) ?
                         config.server.host[0] :
                         config.server.host,
-                        mail = new Mail(`[Log] of ${host}`),
+                        mail = new Mail(`[Logs] of ${host}`),
                         contents = fs.readFileSync(this.filename, "utf8");
                     mail.to(this.mailTo).text(contents).send().then(info => {
                         // Rewrite the log file.

@@ -5,6 +5,13 @@ const HttpController = require("./HttpController");
  * visit the home page of the website through `GET /`.
  */
 module.exports = class Home extends HttpController {
+    constructor(options, req, res) {
+        super(options, req, res);
+        // Empty `urlParams` means the Home controller doesn't accept any URL 
+        // parameters.
+        this.urlParams = [];
+    }
+
     /** GET / or GET /Home/ */
     index(req) {
         return this.view("index", {
