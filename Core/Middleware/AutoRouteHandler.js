@@ -118,7 +118,7 @@ module.exports = (app) => {
                     instance = instance || this;
                     if (instance.requireAuth && !instance.authorized) {
                         if (instance.fallbackTo)
-                            res.location(instance.fallbackTo);
+                            res.redirect(302, instance.fallbackTo);
                         else
                             throw new Error("401 Unauthorized!");
                     }
