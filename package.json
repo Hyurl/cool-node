@@ -6,6 +6,9 @@
     "scripts": {
         "start": "node index.js"
     },
+    "bin": {
+        "cool-node": "bin/cool-node.js"
+    },
     "keywords": [
         "framework",
         "modelar",
