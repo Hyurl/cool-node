@@ -66,7 +66,10 @@ class Logger {
                     });
                 } else {
                     // compress the old file to GZip.
-                    var gzName = this.filename + "." + date.getTime() + ".gz",
+                    var i = this.filename.lastIndexOf("."),
+                        time = date.getTime(),
+                        basename = this.filename.substring(0, i),
+                        gzName = `${basename}.${time}.log.gz`,
                         gzip = zlib.createGzip(),
                         input = fs.createReadStream(this.filename),
                         output = fs.createWriteStream(gzName);
