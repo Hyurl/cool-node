@@ -117,10 +117,12 @@ module.exports = (app) => {
                 function next(instance) {
                     instance = instance || this;
                     if (instance.requireAuth && !instance.authorized) {
-                        if (instance.fallbackTo)
+                        if (instance.fallbackTo) {
                             res.redirect(302, instance.fallbackTo);
-                        else
+                            return;
+                        } else {
                             throw new Error("401 Unauthorized!");
+                        }
                     }
                     var encoding = req.headers["accept-encoding"].split(",")[0];
                     if (encoding == "gzip" && instance.gzip) {
