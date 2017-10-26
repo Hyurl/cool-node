@@ -1,5 +1,17 @@
 **This log starts from version 1.0.4.**
 
+## 1.2.6
+
+(2017-10-26 15:22 UTC+0800)
+
+1. File log support.
+2. `controller.success()` and `controller.error()` return an object.
+3. Asynchronous actions in a controller's constructtor.
+4. `urlParams` property is defined to determine what params a HttpController 
+    may accept.
+5. New command line app generator.
+6. Automatically initiate the main app after installing Cool-Node.
+
 ## 1.2.5
 
 (2017-10-21 11:50 UTC+0800)
