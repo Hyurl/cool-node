@@ -35,36 +35,44 @@ var App = "./App" + (app ? `.${app}` : ""),
 
 if (program.controller) { // Create controller.
     var type = program.type == "socket" ? "Socket" : "Http",
-        input = `${cnDir}/templates/${type}Controller.js`,
+        input = `${cnDir}/CLI/templates/${type}Controller.js`,
         condir = `${App}/Controllers`,
-        output = `${condir}/${program.controller}.js`,
-        contents = fs.readFileSync(input, "utf8").replace(/\{name\}/g, program.controller);
-    if ((type == "Socket" && fs.existsSync(`${condir}/SocketController.js`)) ||
-        type == "Http" && fs.existsSync(`${condir}/HttpController.js`)) {
-        // Get relative dirname of the controller's parent class.
-        var outdir = program.controller.split("/"),
-            parentDir = "";
-        if (outdir.length === 1) {
-            parentDir = "./";
-        } else {
-            for (var i = 1; i < outdir.length; i++) {
-                parentDir += "../";
+        output = `${condir}/${program.controller}.js`;
+    if (fs.existsSync(output)) {
+        console.log("Controller already exists.");
+    } else {
+        var contents = fs.readFileSync(input, "utf8").replace(/\{name\}/g, program.controller);
+        if ((type == "Socket" && fs.existsSync(`${condir}/SocketController.js`)) ||
+            type == "Http" && fs.existsSync(`${condir}/HttpController.js`)) {
+            // Get relative dirname of the controller's parent class.
+            var outdir = program.controller.split("/"),
+                parentDir = "";
+            if (outdir.length === 1) {
+                parentDir = "./";
+            } else {
+                for (var i = 1; i < outdir.length; i++) {
+                    parentDir += "../";
+                }
             }
+            contents = contents.replace("cool-node/Core/Controllers/", parentDir);
         }
-        contents = contents.replace("cool-node/Core/Controllers/", parentDir);
+        outputFile(output, contents, "Controller");
     }
-    outputFile(output, contents, "Controller");
 } else if (program.model) { // Create model.
-    var input = `${cnDir}/templates/Model.js`,
+    var input = `${cnDir}/CLI/templates/Model.js`,
         output = `${App}/Models/${program.model}.js`,
         Model = path.basename(program.model);
-    var contents = fs.readFileSync(input, "utf8")
-        .replace(/__Model__/g, Model)
-        .replace(/__table__/g, Model.toLowerCase());
+    if (fs.existsSync(output)) {
+        console.log("Model already exists.");
+    } else {
+        var contents = fs.readFileSync(input, "utf8")
+            .replace(/__Model__/g, Model)
+            .replace(/__table__/g, Model.toLowerCase());
 
-    outputFile(output, contents, "Model");
+        outputFile(output, contents, "Model");
+    }
 } else if (program.view) { // Create view.
-    var input = `${cnDir}/templates/View.html`,
+    var input = `${cnDir}/CLI/templates/View.html`,
         basename = path.basename(program.view),
         dirname = path.dirname(program.view);
     if (basename.length == program.view.length - 1) {
@@ -75,15 +83,19 @@ if (program.controller) { // Create controller.
     var output = `${App}/Views/${dirname}/${basename}.html`,
         method = "get" + ucfirst(basename),
         controller = basename == "index" ? `${dirname}.index()` : `${dirname}.${method}()`;
-    var contents = fs.readFileSync(input, "utf8").replace("{controller}", controller);
-    outputFile(output, contents, "View");
+    if (fs.existsSync(output)) {
+        console.log("View already exists.");
+    } else {
+        var contents = fs.readFileSync(input, "utf8").replace("{controller}", controller);
+        outputFile(output, contents, "View");
+    }
 } else { // Create app.
-    if (!fs.existsSync(App)) {
+    if (fs.existsSync(App)) {
+        console.log("App already exists.");
+    } else {
         xmkdir(App);
         xcopy(`${cnDir}/App.example`, App);
         console.log("App created.");
-    } else {
-        console.log("App already exists.");
     }
 }
 
