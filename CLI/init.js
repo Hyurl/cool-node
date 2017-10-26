@@ -7,11 +7,19 @@ const { xcopy, xmkdir } = require("../Core/Tools/Functions");
 var cnDir = path.dirname(__dirname),
     proDir = path.dirname(path.dirname(cnDir));
 
-// Copy main app.
-xcopy(`${cnDir}/App.example`, `${proDir}/App`);
-// Copy middleware.
-xcopy(`${cnDir}/Middleware`, `${proDir}/Middleware`);
-// Copy config.js.
-xcopy(`${cnDir}/config.js`, `${proDir}/config.js`);
-// Write index.js
-fs.writeFileSync(`${proDir}/index.js`, `const CoolNode = require("cool-node");`);
+if (!fs.existsSync(`${proDir}/App`)) {
+    // Copy main App.
+    xcopy(`${cnDir}/App.example`, `${proDir}/App`);
+}
+if (!fs.existsSync(`${proDir}/Middleware`)) {
+    // Copy Middleware.
+    xcopy(`${cnDir}/Middleware`, `${proDir}/Middleware`);
+}
+if (!fs.existsSync(`${proDir}/config.js`)) {
+    // Copy config.js.
+    xcopy(`${cnDir}/config.js`, `${proDir}/config.js`);
+}
+if (!fs.existsSync(`${proDir}/index.js`)) {
+    // Write index.js
+    fs.writeFileSync(`${proDir}/index.js`, `const CoolNode = require("cool-node");`);
+}
