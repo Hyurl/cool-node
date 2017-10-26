@@ -12,4 +12,4 @@ xcopy(`${cnDir}/App.example`, `${proDir}/App`);
 // Copy config.js.
 xcopy(`${cnDir}/config.js`, `${proDir}/config.js`);
 // Write index.js
-fs.writeFileSync("./index.js", `const CoolNode = require("cool-node");`);
+fs.writeFileSync(`${cnDir}/index.js`, `const CoolNode = require("cool-node");`);
