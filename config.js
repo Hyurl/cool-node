@@ -7,7 +7,7 @@ module.exports = {
     server: {
         host: "localhost", // For splitting subdomains, could be an array.
         port: 80,
-        timeout: 30000,
+        timeout: 120000, // 2 min.
         showInfo: true, // Show headers like Server and X-Powered-By.
         https: {
             port: 0, // If set, start a HTTPS server.

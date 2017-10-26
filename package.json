@@ -4,7 +4,8 @@
     "description": "A cool and light weight web framework for Node.js to build strong applications, with abilities of auto-routing, cross-protocol, multi-apps, and beyond.",
     "main": "index.js",
     "scripts": {
-        "start": "node index.js"
+        "start": "node index.js",
+        "install": "node ./CLI/init.js"
     },
     "bin": "./CLI/cool-node.js",
     "keywords": [
@@ -21,6 +22,10 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/hyurl/cool-node.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Hyurl/cool-node/issues",
+        "email": "i@hyurl.com"
     },
     "license": "MIT",
     "dependencies": {

@@ -5,9 +5,18 @@ const fs = require("fs");
 const path = require("path");
 const program = require('commander');
 const StringTrimmer = require("string-trimmer");
+const { ucfirst, xcopy, xmkdir } = require("../Core/Tools/Functions");
 
 var filename = require.main.children[0].filename,
     cnDir = path.dirname(filename);
+
+// Initiate the project.
+if(!fs.existsSync("./index.js")){
+    fs.writeFileSync("./index.js", `const CoolNode = require("cool-node");`);
+}
+if(!fs.existsSync("./config.js")){
+    xcopy(cnDir+"/config.js", "./config.js");
+}
 
 var _app;
 
@@ -20,7 +29,7 @@ program.version(CoolNodePackage.version)
     .option("-v, --view <name>", "Create a new view with a specified name.")
     .option("-t, --type <type>", "Define the controller type name, could be `http` (default) or `socket`.")
     .action((app) => _app = app)
-    .on("--help", ()=>{
+    .on("--help", () => {
         console.log("\n\n  Examples:\n");
         console.log("    cool-node app1                           Create an app named app1.");
         console.log("    cool-node app1 -c Article                Create an Article http controller in app1.");
@@ -105,42 +114,5 @@ if (program.controller) { // Create controller.
         xmkdir(App);
         xcopy(`${cnDir}/App.example`, App);
         console.log("App created.");
-    }
-}
-
-/** Copys a directory to a new location. */
-function xcopy(src, dst) {
-    var stat = fs.statSync(src),
-        dir = path.dirname(dst);
-    if (!fs.existsSync(dir)) {
-        xmkdir(dir);
-    }
-    if (stat.isDirectory()) {
-        var files = fs.readdirSync(src);
-        for (let file of files) {
-            xcopy(`${src}/${file}`, `${dst}/${file}`);
-        }
-    } else {
-        var input = fs.createReadStream(src),
-            output = fs.createWriteStream(dst);
-        input.pipe(output);
-    }
-}
-
-/** Makes a string's first char upper-cased. */
-function ucfirst(str) {
-    return str[0].toUpperCase() + str.substring(1);
-}
-
-/** Makes directory recursively. */
-function xmkdir(dir) {
-    dir = path.normalize(dir).replace(/\\/g, "/").split("/");
-    var _dir = [];
-    for (var i = 0; i < dir.length; i++) {
-        _dir.push(dir[i]);
-        let dirname = _dir.join("/");
-        if (!fs.existsSync(dirname)) {
-            fs.mkdirSync(dirname);
-        }
     }
 }
