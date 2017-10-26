@@ -1,4 +1,4 @@
-const Model = require("modelar");
+const Model = require("modelar/Model");
 
 class __Model__ extends Model {
     /**

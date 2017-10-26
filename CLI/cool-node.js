@@ -11,16 +11,25 @@ var filename = require.main.children[0].filename,
 
 var _app;
 
-program.version('1.2.6')
+program.version(CoolNodePackage.version)
     .arguments("[app]")
     .description("Create a new app, controller, model, view. etc.\n  Notice: if `app` is missing, then work on the main app `www`.")
     .option("-a, --app <subdomain>", "Create a new app with a specified subdomain.")
     .option("-c, --controller <name>", "Create a new controller with a specified name.")
     .option("-m, --model <name>", "Create a new model with a specified name.")
     .option("-v, --view <name>", "Create a new view with a specified name.")
-    .option("-t, --type <type>", "Define the controller type name, could be http (default) or socket.")
+    .option("-t, --type <type>", "Define the controller type name, could be `http` (default) or `socket`.")
     .action((app) => _app = app)
-    .parse(process.argv);
+    .on("--help", ()=>{
+        console.log("\n\n  Examples:\n");
+        console.log("    cool-node app1                           Create an app named app1.");
+        console.log("    cool-node app1 -c Article                Create an Article http controller in app1.");
+        console.log("    cool-node app1 -c ArticleSock -t socket  Create an ArticleSock socket controller in app1.")
+        console.log("    cool-node app1 -m Article                Create an Article model in app1");
+        console.log("    cool-node app1 -v Article                Create an Article/index view in app1.");
+        console.log("    cool-node app1 -v Article/Hello          Create an Article/Hello view in app1.");
+        console.log("");
+    }).parse(process.argv);
 
 app = program.app === "www" ? "" : (program.app || (_app === "www" ? "" : _app));
 var App = "./App" + (app ? `.${app}` : ""),

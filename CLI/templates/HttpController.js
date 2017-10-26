@@ -1,6 +1,11 @@
 const HttpController = require("cool-node/Core/Controllers/HttpController");
 
 module.exports = class extends HttpController {
+    constructor(options, req, res) {
+        super(options, req, res);
+        this.urlParams = ["id"];
+    }
+
     /** e.g. GET /{name} */
     index(req, res) {
         // Do stuffs here...
