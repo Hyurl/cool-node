@@ -117,9 +117,9 @@ module.exports = (app) => {
                         } else {
                             throw new Error("401 Unauthorized!");
                         }
-                    } else if(Array.isArray(instance.urlParams)){
-                        for(let key in params){
-                            if(!instance.urlParams.includes(key)){
+                    } else if (Array.isArray(instance.urlParams)) {
+                        for (let key in params) {
+                            if (!instance.urlParams.includes(key)) {
                                 throw new Error("404 Not Found!");
                             }
                         }
