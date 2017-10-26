@@ -32,7 +32,7 @@ function xmkdir(dir) {
     for (var i = 0; i < dir.length; i++) {
         _dir.push(dir[i]);
         let dirname = _dir.join("/");
-        if (!fs.existsSync(dirname)) {
+        if (dirname && !fs.existsSync(dirname)) {
             fs.mkdirSync(dirname);
         }
     }
