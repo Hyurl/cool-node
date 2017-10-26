@@ -15,6 +15,13 @@ Please check out the documentation at
 If you're interested at new features in the next version, please visit 
 [Projects](https://github.com/Hyurl/cool-node/projects) for plans.
 
+## Main Features
+
+* **Based on Class and MVC, New Style of Controllers and Models.**
+* **Fully Asynchronous Controllers.**
+* **Auto Request & Response Handlers.**
+* **Cross Protocol and Multiple Apps on One Server.**
+
 ## Auto-Routing Development
 
 Remember when you were using the node.js internal server or Express, or other 
