@@ -1,8 +1,8 @@
 **This log starts from version 1.0.4.**
 
-## 1.2.6
+## 1.3.0
 
-(2017-10-26 15:22 UTC+0800)
+(2017-10-26 21:31 UTC+0800)
 
 1. File log support.
 2. `controller.success()` and `controller.error()` return an object.
@@ -11,6 +11,7 @@
     may accept.
 5. New command line app generator.
 6. Automatically initiate the main app after installing Cool-Node.
+7. Fix a bug.
 
 ## 1.2.5
 
