@@ -11,11 +11,11 @@ var filename = require.main.children[0].filename,
     cnDir = path.dirname(filename);
 
 // Initiate the project.
-if(!fs.existsSync("./index.js")){
+if (!fs.existsSync("./index.js")) {
     fs.writeFileSync("./index.js", `const CoolNode = require("cool-node");`);
 }
-if(!fs.existsSync("./config.js")){
-    xcopy(cnDir+"/config.js", "./config.js");
+if (!fs.existsSync("./config.js")) {
+    xcopy(cnDir + "/config.js", "./config.js");
 }
 
 var _app;
@@ -27,7 +27,8 @@ program.version(CoolNodePackage.version)
     .option("-c, --controller <name>", "Create a new controller with a specified name.")
     .option("-m, --model <name>", "Create a new model with a specified name.")
     .option("-v, --view <name>", "Create a new view with a specified name.")
-    .option("-t, --type <type>", "Define the controller type name, could be `http` (default) or `socket`.")
+    .option("-t, --type <type>", "Set the type (`http` or `socket`) when creating a controller or middleware.")
+    .option("--middleware <name>", "Create new middleware with a specified name.")
     .action((app) => _app = app)
     .on("--help", () => {
         console.log("\n\n  Examples:\n");
@@ -37,6 +38,8 @@ program.version(CoolNodePackage.version)
         console.log("    cool-node app1 -m Article                Create an Article model in app1");
         console.log("    cool-node app1 -v Article                Create an Article/index view in app1.");
         console.log("    cool-node app1 -v Article/Hello          Create an Article/Hello view in app1.");
+        console.log("    cool-node --middleware Foo               Create Foo http middleware.");
+        console.log("    cool-node --middleware Foo -t socket     Create Foo socket middleware.");
         console.log("");
     }).parse(process.argv);
 
@@ -48,7 +51,7 @@ var App = "./App" + (app ? `.${app}` : ""),
             xmkdir(dir);
         }
         fs.writeFileSync(filename, data);
-        console.log(`${type} created.`);
+        console.log(`${type} '${filename}' created.`);
     }
 
 if (program.controller) { // Create controller.
@@ -107,12 +110,22 @@ if (program.controller) { // Create controller.
         var contents = fs.readFileSync(input, "utf8").replace("{controller}", controller);
         outputFile(output, contents, "View");
     }
+} else if (program.middleware) { // Create middleware.
+    var type = program.type == "socket" ? "Socket" : "Http",
+        src = `${cnDir}/CLI/templates/${type}Middleware.js`,
+        dst = "./Middleware/" + type.toLowerCase() + `/${program.middleware}.js`;
+    if (fs.existsSync(dst)) {
+        console.log(`Middleware '${dst}' already exists.`);
+    } else {
+        xcopy(src, dst);
+        console.log(`Middleware '${dst}' created.`);
+    }
 } else { // Create app.
     if (fs.existsSync(App)) {
-        console.log("App already exists.");
+        console.log(`App '${App}' already exists.`);
     } else {
         xmkdir(App);
         xcopy(`${cnDir}/App.example`, App);
-        console.log("App created.");
+        console.log(`App '${App}' created.`);
     }
 }
