@@ -6,7 +6,7 @@
 
 1. File log support.
 2. `controller.success()` and `controller.error()` return an object.
-3. Asynchronous actions in a controller's constructtor.
+3. Asynchronous actions in a controller's constructor.
 4. `urlParams` property is defined to determine what params a HttpController 
     may accept.
 5. New command line app generator.
