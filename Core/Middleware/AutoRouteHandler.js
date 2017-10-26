@@ -99,12 +99,6 @@ module.exports = (app) => {
         // Handle the procedure in a Promise context.
         new Promise((resolve, reject) => {
             try {
-                // Throw 404 if the URL is invalid.
-                var ext = path.extname(uri),
-                    strictURL = config.server.strictURL || initConfig.server.strictURL;
-                if (ext && strictURL.enabled && !strictURL.exception.includes(ext)) {
-                    throw new Error("404 Not Found!");
-                }
                 var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri),
                     options = {
                         viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,

@@ -23,12 +23,6 @@ module.exports = {
                 pingTimeout: 5000,
                 pingInterval: 5000,
             },
-        },
-        strictURL: {
-            // If enabled, when visit a link with an extension, but it's not a
-            // file, throw 404.
-            enabled: true,
-            exception: [".html"] // Except for these extensions.
         }
     },
     database: { // Settings for Modelar.
