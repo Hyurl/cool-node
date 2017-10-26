@@ -61,6 +61,7 @@ In JavaScript (`/App/Controllers/HttpTest.js`):
 const HttpController = require("./HttpController");
 
 module.exports = class extends HttpController{
+    /** GET /HttpTest/ */
     index(){
         return this.view({
             title: "Cool-Node Test",
