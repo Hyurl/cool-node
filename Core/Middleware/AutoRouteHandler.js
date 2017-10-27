@@ -2,8 +2,6 @@ const path = require("path");
 const fs = require("fs");
 const zlib = require("zlib");
 const multer = require("multer");
-const md5 = require("md5");
-const md5File = require('md5-file');
 const Controller = require("../Controllers/Controller");
 const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
 const initConfig = require("../../config");
@@ -138,7 +136,7 @@ module.exports = (app) => {
                             }
                         }
                     }
-                    if (instance.uploadConfig.fields.length) {
+                    if (req.method == "POST" && instance.uploadConfig.fields.length) {
                         // Handle file uploading.
                         var fields = [];
                         for (let field of instance.uploadConfig.fields) {
@@ -150,7 +148,6 @@ module.exports = (app) => {
                         var date = (new DateTime).date,
                             savePath = `${instance.uploadConfig.savePath}/${date}`,
                             uploader = multer({
-                                // dest: instance.uploadConfig.savePath,
                                 preservePath: true,
                                 storage: multer.diskStorage({
                                     destination: (req, file, cb) => {
@@ -165,10 +162,10 @@ module.exports = (app) => {
                                     }
                                 }),
                                 fileFilter: (req, file, cb) => {
-                                    try{
+                                    try {
                                         var ok = instance.uploadConfig.filter(file);
                                         cb(null, ok);
-                                    }catch(err){
+                                    } catch (err) {
                                         reject(err);
                                     }
                                 }
