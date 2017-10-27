@@ -75,7 +75,7 @@ class HttpController extends Controller {
 
         // Configurations for uploading files.
         this.uploadConfig = {
-            fields: [], // Fields that carries files.
+            fields: [], // Fields that carry files.
             maxCount: 5, // Max number of files that each field can carry.
             savePath: ROOT + "/" + path.dirname(this.viewPath) + "/Uploads",
             filter: (file) => true, // true: accept, false: reject.
