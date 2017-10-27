@@ -1,8 +1,8 @@
 **This log starts from version 1.0.4.**
 
-## 1.3.1
+## 1.3.2
 
-(2017-10-27 17:58 UTC+0800)
+(2017-10-27 20:39 UTC+0800)
 
 1. File upload support.
 2. Other features improved.

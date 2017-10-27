@@ -16,7 +16,7 @@ class Logger {
      */
     constructor(filename, action = "") {
         this.filename = filename;
-        this.fileSize = 1024 * 1024 * 1024; // 1 MB.
+        this.fileSize = 1024 * 1024 * 2; // 2 MB.
         this.action = action || "default";
 
         // If this property is set, when the log file up to limit, send its 
@@ -62,7 +62,7 @@ class Logger {
                     var date = dateTime.date,
                         dir = path.dirname(this.filename) + `/${date}/`,
                         basename = path.basename(this.filename);
-                    if(!fs.existsSync(dir)){
+                    if (!fs.existsSync(dir)) {
                         fs.mkdirSync(dir);
                     }
                     var gzName = nextFilename(`${dir}${basename}.gz`, ".log.gz"),

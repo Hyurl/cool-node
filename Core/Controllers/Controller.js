@@ -170,14 +170,14 @@ class Controller {
     get logger() {
         if (!this.__logger) {
             var conf = this.logConfig;
-            if(conf.filename){
+            if (conf.filename) {
                 var filename = conf.filename;
-            }else{
+            } else {
                 var appPath = path.dirname(`${ROOT}/${this.viewPath}`),
                     filename = appPath + "/Logs/cool-node.log";
             }
             this.__logger = new Logger(filename, this.action);
-            this.__logger.fileSize = conf.fileSize || 1024 * 1024 * 1024;
+            this.__logger.fileSize = conf.fileSize || 1024 * 1024 * 2;
             this.__logger.mailTo = conf.mailTo;
         }
         return this.__logger;
