@@ -1,8 +1,14 @@
 const path = require("path");
+const fs = require("fs");
 const zlib = require("zlib");
+const multer = require("multer");
+const md5 = require("md5");
+const md5File = require('md5-file');
 const Controller = require("../Controllers/Controller");
 const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
 const initConfig = require("../../config");
+const DateTime = require("../Tools/DateTime");
+const { xmkdir, randStr, nextFilename } = require("../Tools/Functions");
 
 function getParams(uri, depth) {
     var params = {};
@@ -108,6 +114,14 @@ module.exports = (app) => {
                     };
                 req.params = params;
 
+                function resolver(instance) {
+                    var encoding = req.headers["accept-encoding"].split(",")[0];
+                    if (encoding == "gzip" && instance.gzip) {
+                        res.gzip = true;
+                    }
+                    resolve(instance[method](req, res));
+                }
+
                 function next(instance) {
                     instance = instance || this;
                     if (instance.requireAuth && !instance.authorized) {
@@ -124,11 +138,51 @@ module.exports = (app) => {
                             }
                         }
                     }
-                    var encoding = req.headers["accept-encoding"].split(",")[0];
-                    if (encoding == "gzip" && instance.gzip) {
-                        res.gzip = true;
+                    if (instance.uploadConfig.fields.length) {
+                        // Handle file uploading.
+                        var fields = [];
+                        for (let field of instance.uploadConfig.fields) {
+                            fields.push({
+                                name: field,
+                                maxCount: instance.uploadConfig.maxCount
+                            });
+                        }
+                        var date = (new DateTime).date,
+                            savePath = `${instance.uploadConfig.savePath}/${date}`,
+                            uploader = multer({
+                                // dest: instance.uploadConfig.savePath,
+                                preservePath: true,
+                                storage: multer.diskStorage({
+                                    destination: (req, file, cb) => {
+                                        if (!fs.existsSync(savePath)) {
+                                            xmkdir(savePath);
+                                        }
+                                        cb(null, savePath);
+                                    },
+                                    filename: (req, file, cb) => {
+                                        var filename = nextFilename(`${savePath}/${file.originalname}`);
+                                        cb(null, path.basename(filename));
+                                    }
+                                }),
+                                fileFilter: (req, file, cb) => {
+                                    try{
+                                        var ok = instance.uploadConfig.filter(file);
+                                        cb(null, ok);
+                                    }catch(err){
+                                        reject(err);
+                                    }
+                                }
+                            }).fields(fields);
+                        uploader(req, res, (err) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolver(instance);
+                            }
+                        });
+                    } else {
+                        resolver(instance);
                     }
-                    resolve(instance[method](req, res));
                 }
 
                 if (Class.prototype.constructor.length === 4) {

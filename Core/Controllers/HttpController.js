@@ -1,3 +1,4 @@
+const path = require("path");
 const Controller = require("./Controller");
 
 /**
@@ -71,6 +72,14 @@ class HttpController extends Controller {
         // An array defines what parameters that the controller accepts, null 
         // means disabled and accepts all.
         this.urlParams = null;
+
+        // Configurations for uploading files.
+        this.uploadConfig = {
+            fields: [], // Fields that carries files.
+            maxCount: 5, // Max number of files that each field can carry.
+            savePath: ROOT + "/" + path.dirname(this.viewPath) + "/Uploads",
+            filter: (file) => true, // true: accept, false: reject.
+        };
     }
 
     /**

@@ -36,7 +36,7 @@ program.version(CoolNodePackage.version)
         console.log("    cool-node app1 -c Article                Create an Article http controller in app1.");
         console.log("    cool-node app1 -c ArticleSock -t socket  Create an ArticleSock socket controller in app1.")
         console.log("    cool-node app1 -m Article                Create an Article model in app1");
-        console.log("    cool-node app1 -v Article                Create an Article/index view in app1.");
+        console.log("    cool-node app1 -v Article/               Create an Article/index view in app1.");
         console.log("    cool-node app1 -v Article/Hello          Create an Article/Hello view in app1.");
         console.log("    cool-node --middleware Foo               Create Foo http middleware.");
         console.log("    cool-node --middleware Foo -t socket     Create Foo socket middleware.");

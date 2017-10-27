@@ -3,6 +3,8 @@ const zlib = require("zlib");
 const path = require("path");
 const util = require("util");
 const Mail = require("./Mail");
+const DateTime = require("./DateTime");
+const { nextFilename } = require("../Tools/Functions");
 const { EOL } = require("os");
 
 class Logger {
@@ -26,21 +28,8 @@ class Logger {
     /** Outputs a message to the log file. */
     __output(level, ...msg) {
         // Get time info.
-        var date = new Date,
-            Y = date.getFullYear(),
-            m = date.getMonth() + 1,
-            d = date.getDate(),
-            H = date.getHours(),
-            i = date.getMinutes(),
-            s = date.getSeconds(),
-            ms = date.getMilliseconds();
-        m = m >= 10 ? m : `0${m}`;
-        d = d >= 10 ? d : `0${d}`;
-        H = H >= 10 ? H : `0${H}`;
-        i = i >= 10 ? i : `0${i}`;
-        s = s >= 10 ? s : `0${s}`;
-        ms = ms >= 100 ? ms : (ms >= 10 ? `0${ms}` : `00${ms}`);
-        var timeStr = `${Y}-${m}-${d} ${H}:${i}:${s}.${ms}`;
+        var dateTime = new DateTime;
+        var timeStr = dateTime.toString();
 
         // Convert msg.
         msg = msg.map(item => {
@@ -69,11 +58,14 @@ class Logger {
                         this.error(err);
                     });
                 } else {
-                    // compress the old file to GZip.
-                    var i = this.filename.lastIndexOf("."),
-                        time = date.getTime(),
-                        basename = this.filename.substring(0, i),
-                        gzName = `${basename}.${time}.log.gz`,
+                    // Compress the old file to GZip.
+                    var date = dateTime.date,
+                        dir = path.dirname(this.filename) + `/${date}/`,
+                        basename = path.basename(this.filename);
+                    if(!fs.existsSync(dir)){
+                        fs.mkdirSync(dir);
+                    }
+                    var gzName = nextFilename(`${dir}${basename}.gz`, ".log.gz"),
                         gzip = zlib.createGzip(),
                         input = fs.createReadStream(this.filename),
                         output = fs.createWriteStream(gzName);

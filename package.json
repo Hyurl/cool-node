@@ -38,6 +38,7 @@
         "marked": "^0.3.6",
         "memorystore": "^1.5.0",
         "modelar": "^1.0.5",
+        "multer": "^1.3.0",
         "mysql": "^2.14.1",
         "nodemailer": "^4.1.0",
         "qs": "^6.5.1",
