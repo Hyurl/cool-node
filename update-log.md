@@ -2,6 +2,9 @@
 
 ## 1.3.3
 
+
+(2017-10-28 11:23 UTC+0800)
+
 1. Fix a bug in command line app generator.
 
 ## 1.3.2
