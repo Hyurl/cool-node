@@ -120,7 +120,7 @@ if (program.controller) { // Create controller.
         }
     } else {
         dirname = dirname + "/";
-        method = "get" + basename;
+        method = basename == "index" ? basename : "get" + basename;
     }
     var output = `${App}/Views/${dirname}${basename}.html`;
     if (method) {
