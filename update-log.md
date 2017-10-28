@@ -1,5 +1,9 @@
 **This log starts from version 1.0.4.**
 
+## 1.3.3
+
+1. Fix a bug in command line app generator.
+
 ## 1.3.2
 
 (2017-10-27 20:39 UTC+0800)

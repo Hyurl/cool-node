@@ -12,7 +12,7 @@ module.exports = class Home extends HttpController {
         this.urlParams = [];
     }
 
-    /** GET / or GET /Home/ */
+    /** GET / */
     index(req) {
         return this.view("index", {
             title: "Cool-Node",

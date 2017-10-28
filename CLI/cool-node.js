@@ -26,9 +26,9 @@ program.version(CoolNodePackage.version)
     .option("-a, --app <subdomain>", "Create a new app with a specified subdomain.")
     .option("-c, --controller <name>", "Create a new controller with a specified name.")
     .option("-m, --model <name>", "Create a new model with a specified name.")
+    .option("--middleware <name>", "Create new middleware with a specified name.")
     .option("-v, --view <name>", "Create a new view with a specified name.")
     .option("-t, --type <type>", "Set the type (`http` or `socket`) when creating a controller or middleware.")
-    .option("--middleware <name>", "Create new middleware with a specified name.")
     .action((app) => _app = app)
     .on("--help", () => {
         console.log("\n\n  Examples:\n");
@@ -55,18 +55,19 @@ var App = "./App" + (app ? `.${app}` : ""),
     }
 
 if (program.controller) { // Create controller.
-    var type = program.type == "socket" ? "Socket" : "Http",
+    var controller = StringTrimmer.trim(program.controller, "/");
+    type = program.type == "socket" ? "Socket" : "Http",
         input = `${cnDir}/CLI/templates/${type}Controller.js`,
         condir = `${App}/Controllers`,
-        output = `${condir}/${program.controller}.js`;
+        output = `${condir}/${controller}.js`;
     if (fs.existsSync(output)) {
         console.log("Controller already exists.");
     } else {
-        var contents = fs.readFileSync(input, "utf8").replace(/\{name\}/g, program.controller);
+        var contents = fs.readFileSync(input, "utf8").replace(/\{name\}/g, controller);
         if ((type == "Socket" && fs.existsSync(`${condir}/SocketController.js`)) ||
             type == "Http" && fs.existsSync(`${condir}/HttpController.js`)) {
             // Get relative dirname of the controller's parent class.
-            var outdir = program.controller.split("/"),
+            var outdir = controller.split("/"),
                 parentDir = "";
             if (outdir.length === 1) {
                 parentDir = "./";
@@ -80,9 +81,10 @@ if (program.controller) { // Create controller.
         outputFile(output, contents, "Controller");
     }
 } else if (program.model) { // Create model.
-    var input = `${cnDir}/CLI/templates/Model.js`,
-        output = `${App}/Models/${program.model}.js`,
-        Model = path.basename(program.model);
+    var model = StringTrimmer.trim(program.model, "/"),
+        input = `${cnDir}/CLI/templates/Model.js`,
+        output = `${App}/Models/${model}.js`,
+        Model = path.basename(model);
     if (fs.existsSync(output)) {
         console.log("Model already exists.");
     } else {
@@ -93,17 +95,39 @@ if (program.controller) { // Create controller.
         outputFile(output, contents, "Model");
     }
 } else if (program.view) { // Create view.
-    var input = `${cnDir}/CLI/templates/View.html`,
-        basename = path.basename(program.view),
-        dirname = path.dirname(program.view);
-    if (basename.length == program.view.length - 1) {
+    var view = StringTrimmer.trimLeft(program.view, "/"),
+        input = `${cnDir}/CLI/templates/View.html`,
+        basename = path.basename(view),
+        dirname = path.dirname(view),
+        className = dirname,
+        method = "";
+    if (view == "" || view == "index") {
+        dirname = "";
+        basename = "index";
+        method = "index";
+        className = "Home";
+    } else if (view[view.length - 1] == "/") {
         // If only specified the dirname, then create an index view.
         basename = "index";
-        dirname = StringTrimmer.trim(program.view, "/");
+        method = "index";
+        dirname = view;
+        className = StringTrimmer.trim(view, "/");
+    } else if (dirname == ".") {
+        dirname = "";
+        if(isNaN(basename)){
+            className = "Home";
+            method = "get" + basename;
+        }
+    } else {
+        dirname = dirname + "/";
+        method = "get" + basename;
     }
-    var output = `${App}/Views/${dirname}/${basename}.html`,
-        method = "get" + ucfirst(basename),
-        controller = basename == "index" ? `${dirname}.index()` : `${dirname}.${method}()`;
+    var output = `${App}/Views/${dirname}${basename}.html`;
+    if (method) {
+        var controller = `${className}.${method}()`;
+    } else {
+        var controller = "none";
+    }
     if (fs.existsSync(output)) {
         console.log("View already exists.");
     } else {
@@ -111,9 +135,14 @@ if (program.controller) { // Create controller.
         outputFile(output, contents, "View");
     }
 } else if (program.middleware) { // Create middleware.
+    var middleware = program.middleware;
+    if (middleware[middleware.length - 1] == "/") {
+        middleware += "index";
+    }
+    middleware = StringTrimmer.trimLeft(middleware, "/");
     var type = program.type == "socket" ? "Socket" : "Http",
         src = `${cnDir}/CLI/templates/${type}Middleware.js`,
-        dst = "./Middleware/" + type.toLowerCase() + `/${program.middleware}.js`;
+        dst = "./Middleware/" + type.toLowerCase() + `/${middleware}.js`;
     if (fs.existsSync(dst)) {
         console.log(`Middleware '${dst}' already exists.`);
     } else {
