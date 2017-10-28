@@ -26,7 +26,7 @@ program.version(CoolNodePackage.version)
     .option("-a, --app <subdomain>", "Create a new app with a specified subdomain.")
     .option("-c, --controller <name>", "Create a new controller with a specified name.")
     .option("-m, --model <name>", "Create a new model with a specified name.")
-    .option("--middleware <name>", "Create new middleware with a specified name.")
+    .option("--middleware <name>", "Create a new middleware with a specified name.")
     .option("-v, --view <name>", "Create a new view with a specified name.")
     .option("-t, --type <type>", "Set the type (`http` or `socket`) when creating a controller or middleware.")
     .action((app) => _app = app)
@@ -38,8 +38,8 @@ program.version(CoolNodePackage.version)
         console.log("    cool-node app1 -m Article                Create an Article model in app1");
         console.log("    cool-node app1 -v Article/               Create an Article/index view in app1.");
         console.log("    cool-node app1 -v Article/Hello          Create an Article/Hello view in app1.");
-        console.log("    cool-node --middleware Foo               Create Foo http middleware.");
-        console.log("    cool-node --middleware Foo -t socket     Create Foo socket middleware.");
+        console.log("    cool-node --middleware Foo               Create a http middleware named Foo.");
+        console.log("    cool-node --middleware Foo -t socket     Create a socket middleware named Foo.");
         console.log("");
     }).parse(process.argv);
 
@@ -134,7 +134,7 @@ if (program.controller) { // Create controller.
         var contents = fs.readFileSync(input, "utf8").replace("{controller}", controller);
         outputFile(output, contents, "View");
     }
-} else if (program.middleware) { // Create middleware.
+} else if (program.middleware) { // Create a middleware.
     var middleware = program.middleware;
     if (middleware[middleware.length - 1] == "/") {
         middleware += "index";

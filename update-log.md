@@ -1,7 +1,13 @@
 **This log starts from version 1.0.4.**
 
-## 1.3.3
+## 1.3.4
 
+(2017-10-29 8:00 UTC+800)
+
+1. Uploaded filename could be random or user-defined.
+2. Socket clients automatically joins into the room of the subdomain app.
+
+## 1.3.3
 
 (2017-10-28 11:23 UTC+0800)
 

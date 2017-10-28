@@ -15,6 +15,8 @@ module.exports = (io) => {
             }
         }
         socket.subdomain = socket.subdomain || "www";
+        // Socket joins into the room of the subdomain.
+        socket.join(socket.subdomain);
         next();
     });
 };

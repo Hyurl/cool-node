@@ -157,8 +157,16 @@ module.exports = (app) => {
                                         cb(null, savePath);
                                     },
                                     filename: (req, file, cb) => {
-                                        var filename = nextFilename(`${savePath}/${file.originalname}`);
-                                        cb(null, path.basename(filename));
+                                        if (instance.uploadConfig.filename instanceof Function) {
+                                            var filename = instance.uploadConfig.filename(file);
+                                        } else if (instance.uploadConfig.filename === "random") {
+                                            var extname = path.extname(file.originalname),
+                                                filename = randStr(16) + extname;
+                                        } else { // auto-increment
+                                            var nextname = nextFilename(`${savePath}/${file.originalname}`),
+                                                filename = path.basename(nextname);
+                                        }
+                                        cb(null, filename);
                                     }
                                 }),
                                 fileFilter: (req, file, cb) => {
