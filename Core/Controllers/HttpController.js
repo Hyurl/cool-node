@@ -1,5 +1,6 @@
 const path = require("path");
 const Controller = require("./Controller");
+const { randStr } = require("../Tools/Functions");
 
 /**
  * HttpController manages requests come from a HTTP request, it provides a 
@@ -66,7 +67,7 @@ class HttpController extends Controller {
 
         this.authorized = req.user !== null;
 
-        // Send data compressed with GZip.
+        // Send data compressed to GZip.
         this.gzip = true;
 
         // An array defines what parameters that the controller accepts, null 
@@ -75,6 +76,13 @@ class HttpController extends Controller {
 
         // Set a callback name for jsonp, false means disabled.
         this.jsonp = "callback";
+
+        // Enable token checking, if true, when request method is DELETE, 
+        // PATCH, POST or PUT, the client must send a `x-csrf-token` field to 
+        // the server via request header, URL parameters, URL query or request
+        // body. You can call `req.csrfToken` to get the auto-generated token 
+        // in a GET action and pass it to a view.
+        this.csrfToken = false;
 
         // Configurations for uploading files.
         this.uploadConfig = {

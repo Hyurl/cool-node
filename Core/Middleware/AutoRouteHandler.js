@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const zlib = require("zlib");
+const url = require("url");
 const multer = require("multer");
 const co = require("co");
 const Controller = require("../Controllers/Controller");
@@ -8,6 +9,7 @@ const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
 const initConfig = require("../../config");
 const DateTime = require("../Tools/DateTime");
 const { xmkdir, randStr, nextFilename } = require("../Tools/Functions");
+const EFFECT_METHODS = ["DELETE", "PATCH", "POST", "PUT"];
 
 function getParams(uri, depth) {
     var params = {};
@@ -115,13 +117,6 @@ module.exports = (app) => {
                 req.params = params;
 
                 function resolver(instance) {
-                    var encoding = req.headers["accept-encoding"].split(",")[0];
-                    if (encoding == "gzip" && instance.gzip) {
-                        res.gzip = true;
-                    }
-                    if (req.method == "GET" && instance.jsonp && req.query[instance.jsonp]) {
-                        res.jsonpCallback = req.query[instance.jsonp];
-                    }
                     if (instance[method].constructor.name == "GeneratorFunction") {
                         resolve(co(instance[method](req, res)));
                     } else {
@@ -146,8 +141,60 @@ module.exports = (app) => {
                             }
                         }
                     }
+                    // Handle CSRF token.
+                    if (instance.csrfToken) {
+                        if (req.method == "GET") {
+                            // Define a setter to access and initiate CSRF token.
+                            Object.defineProperty(req, "csrfToken", {
+                                set: (v) => {},
+                                get: () => {
+                                    if (!req.__csrfToken) {
+                                        if (!req.session.csrfTokens) {
+                                            req.session.csrfTokens = {};
+                                        }
+                                        // Differ tokens by actions.
+
+                                        var tokens = req.session.csrfTokens,
+                                            token = randStr(64);
+                                        req.__csrfToken = tokens[instance.action] = token;
+                                        res.set("X-CSRF-Token", req.__csrfToken);
+                                    }
+                                    return req.__csrfToken;
+                                }
+                            });
+                        } else if (EFFECT_METHODS.includes(req.method)) {
+                            // Must send request header: referer. 
+                            if (!req.headers.referer) {
+                                throw new Error("401 Unauthorized!");
+                            }
+                            var ref = req.headers.referer,
+                                uri = url.parse(ref).pathname.substring(1),
+                                // Parse referer and get old controller.
+                                _controller = getHttpController(subdomain, "GET", uri),
+                                action = _controller.name + "." + _controller.method,
+                                name = "x-csrf-token",
+                                token = req.session.csrfTokens && req.session.csrfTokens[action];
+                            if (token === undefined ||
+                                req.headers[name] != token &&
+                                req.params[name] != token &&
+                                req.query[name] != token &&
+                                req.body[name] != token) {
+                                throw new Error("401 Unauthorized!");
+                            }
+                        }
+                    }
+                    // Handle GZip.
+                    var encodings = req.headers["accept-encoding"],
+                        encoding = encodings && encodings.split(",")[0];
+                    if (encoding == "gzip" && instance.gzip) {
+                        res.gzip = true;
+                    }
+                    // Handle jsonp.
+                    if (req.method == "GET" && instance.jsonp && req.query[instance.jsonp]) {
+                        res.jsonpCallback = req.query[instance.jsonp];
+                    }
+                    // Handle file uploading.
                     if (req.method == "POST" && instance.uploadConfig.fields.length) {
-                        // Handle file uploading.
                         var fields = [];
                         for (let field of instance.uploadConfig.fields) {
                             fields.push({
