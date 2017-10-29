@@ -165,7 +165,7 @@ module.exports = (app) => {
                         } else if (EFFECT_METHODS.includes(req.method)) {
                             // Must send request header: referer. 
                             if (!req.headers.referer) {
-                                throw new Error("401 Unauthorized!");
+                                throw new Error("403 Forbidden!");
                             }
                             var ref = req.headers.referer,
                                 uri = url.parse(ref).pathname.substring(1),
@@ -179,7 +179,7 @@ module.exports = (app) => {
                                 req.params[name] != token &&
                                 req.query[name] != token &&
                                 req.body[name] != token) {
-                                throw new Error("401 Unauthorized!");
+                                throw new Error("403 Forbidden!");
                             }
                         }
                     }
