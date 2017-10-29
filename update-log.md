@@ -6,6 +6,10 @@
 
 1. Uploaded filename could be random or user-defined.
 2. Socket clients automatically joins into the room of the subdomain app.
+3. Generator methods (*/yield) are supported in controllers.
+4. More error handling policy, `error`  object will be passed to error pages.
+5. If clients accept, thrown errors will be sent as JSON with 200 status.
+6. Jsonp support.
 
 ## 1.3.3
 

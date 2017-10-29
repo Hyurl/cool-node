@@ -23,6 +23,10 @@ module.exports = {
                 pingTimeout: 5000,
                 pingInterval: 5000,
             },
+        },
+        error: { // Error settings only suit development environment.
+            stack: false, // If true, display full error info to the client.
+            log: false, // If true, errors will be logged to a file.
         }
     },
     database: { // Settings for Modelar.

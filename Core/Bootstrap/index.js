@@ -3,6 +3,11 @@ const bodyParser = require('body-parser');
 const app = express();
 const session = require("express-session")(config.session);
 const version = require("../../package.json").version;
+const HttpController = require("../Controllers/HttpController");
+const SocketController = require("../Controllers/SocketController");
+const Mail = require("../Tools/Mail");
+const Logger = require("../Tools/Logger");
+const DateTime = require("../Tools/DateTime");
 
 var loadCustomHandler = require("./CustomHandlerLoader");
 
@@ -116,10 +121,17 @@ global.wssServer = wssServer;
 
 module.exports = {
     version,
+    ROOT,
+    config,
     app,
     httpServer,
     httpsServer,
     wsServer,
     wssServer,
-    initWSServer
+    initWSServer,
+    HttpController,
+    SocketController,
+    Mail,
+    Logger,
+    DateTime,
 };

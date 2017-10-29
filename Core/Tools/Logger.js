@@ -17,7 +17,7 @@ class Logger {
     constructor(filename, action = "") {
         this.filename = filename;
         this.fileSize = 1024 * 1024 * 2; // 2 MB.
-        this.action = action || "default";
+        this.action = action || "none";
 
         // If this property is set, when the log file up to limit, send its 
         // contents to the receiver. Must configure mail information in 
@@ -32,9 +32,9 @@ class Logger {
         var timeStr = dateTime.toString();
 
         // Convert msg.
-        msg = msg.map(item => {
-            return item instanceof Error ? item.message : item;
-        });
+        // msg = msg.map(item => {
+        //     return item instanceof Error ? item.message : item;
+        // });
         // Get log contents.
         msg = util.format(...msg);
         var logStr = `[${timeStr}] [${level}] ${this.action} - ${msg}${EOL}`;

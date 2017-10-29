@@ -73,6 +73,9 @@ class HttpController extends Controller {
         // means disabled and accepts all.
         this.urlParams = null;
 
+        // Set a callback name for jsonp, false means disabled.
+        this.jsonp = "callback";
+
         // Configurations for uploading files.
         this.uploadConfig = {
             fields: [], // Fields that carry files.

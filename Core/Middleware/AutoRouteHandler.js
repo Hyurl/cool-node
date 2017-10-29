@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const zlib = require("zlib");
 const multer = require("multer");
+const co = require("co");
 const Controller = require("../Controllers/Controller");
 const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
 const initConfig = require("../../config");
@@ -96,20 +97,21 @@ module.exports = (app) => {
         var _url = path.normalize(req.url).replace(/\\\\|\\/g, "/"),
             _path = path.normalize(req.path).replace(/\\\\|\\/g, "/"),
             subdomain = req.subdomain,
-            uri = _path.substring(1);
+            uri = _path.substring(1),
+            options = null;
         if (uri == "Home" || uri.indexOf("Home/") === 0) {
             res.redirect(301, _url.replace("/Home", "") || "/");
         }
         // Handle the procedure in a Promise context.
         new Promise((resolve, reject) => {
             try {
-                var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri),
-                    options = {
-                        viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                        defaultView: view,
-                        action: name + "." + method,
-                        actionName: method
-                    };
+                var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri);
+                options = {
+                    viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
+                    defaultView: view,
+                    action: name + "." + method,
+                    actionName: method
+                };
                 req.params = params;
 
                 function resolver(instance) {
@@ -117,7 +119,14 @@ module.exports = (app) => {
                     if (encoding == "gzip" && instance.gzip) {
                         res.gzip = true;
                     }
-                    resolve(instance[method](req, res));
+                    if (req.method == "GET" && instance.jsonp && req.query[instance.jsonp]) {
+                        res.jsonpCallback = req.query[instance.jsonp];
+                    }
+                    if (instance[method].constructor.name == "GeneratorFunction") {
+                        resolve(co(instance[method](req, res)));
+                    } else {
+                        resolve(instance[method](req, res));
+                    }
                 }
 
                 function next(instance) {
@@ -132,6 +141,7 @@ module.exports = (app) => {
                     } else if (Array.isArray(instance.urlParams)) {
                         for (let key in params) {
                             if (!instance.urlParams.includes(key)) {
+                                options = null; // Reset options.
                                 throw new Error("404 Not Found!");
                             }
                         }
@@ -209,8 +219,14 @@ module.exports = (app) => {
                     // Send data to the client.
                     if (data === null || data === undefined) {
                         res.end();
-                    } else if (typeof data == "string") {
-                        if (res.gzip) {
+                    } else if (data instanceof Buffer) {
+                        res.send(data);
+                    } else if (typeof data != "function") {
+                        if (res.jsonpCallback) {
+                            var json = JSON.stringify(data);
+                            res.set("Content-Type", "application/jsonp");
+                            res.send(`${res.jsonpCallback}(${json});`);
+                        } else if (typeof data == "string" && res.gzip) {
                             // Send compressed data.
                             data = zlib.gzipSync(data);
                             res.set("Content-Encoding", "gzip");
@@ -219,26 +235,60 @@ module.exports = (app) => {
                         } else {
                             res.send(data);
                         }
-                    } else if (data instanceof Buffer) {
-                        res.send(data);
-                    } else if (typeof data != "function") {
-                        res.json(data);
                     } else {
                         throw new Error("500 Internal Server Error!");
                     }
                 }
             }
         }).catch(err => {
-            var code = parseInt(err.message) || 500;
-            // Try to load the error page, if not present, then show the error 
-            // message.
-            (new Controller({
+            var code = parseInt(err.message) || 500,
+                accept = req.headers.accept && req.headers.accept.split(",")[0],
+                stack = config.server.error && config.server.error.stack,
+                log = config.server.error && config.server.error.log,
+                error = stack ? err.stack : err.message;
+            if (req.url.length > 64) {
+                // If URL's length exceeds 64, cut down exceeding part.
+                var url = req.url.substring(0, 61) + "...";
+            } else {
+                var url = req.url;
+            }
+            var controller = new Controller(options || {
                 viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-            })).view(code).then(content => {
-                res.status(code).send(content);
-            }).catch(_err => {
-                res.status(code).send(err.message);
+                action: `${req.method} ${url}`
             });
+            if (!stack && error.indexOf(`${code}: `) === 0) {
+                // If error message is with the style '<code>: message', 
+                // then cut out the real message.
+                error = error.substring(`${code}: `.length);
+            }
+            if (accept == "application/json") {
+                res.send(controller.error(error, code));
+            } else if (res.jsonpCallback) {
+                var json = JSON.stringify(controller.error(error, code));
+                res.set("Content-Type", "application/jsonp");
+                res.send(`${res.jsonpCallback}(${json});`);
+            } else {
+                // Try to load the error page, if not present, then show the 
+                // error message.
+                controller.view(code, { err }).then(content => {
+                    res.status(code).send(content);
+                }).catch(_err => {
+                    if (stack) {
+                        // Escape HTML tags.
+                        error = error.replace(/<[a-zA-Z0-9]+\b/g, match => {
+                            return "&lt;" + match.substring(1);
+                        }).replace(/\b[a-zA-Z0-9]+>/g, match => {
+                            return match.substring(0, match.length - 1) + "&gt;";
+                        });
+                        error = `<pre>${error}</pre>`;
+                    }
+                    res.status(code).send(error);
+                });
+            }
+            if (log) {
+                // Log the error to a file.
+                controller.logger.warn(error);
+            }
         });
     });
 };
