@@ -38,21 +38,27 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
     var controller = HttpControllerMap[subdomain][uri];
     if (controller) { // Controller exists.
         if (method && controller.methods[method] !== undefined) {
-            if (controller.methods[method] != type) {
-                // If request method not matching, throw 405 error.
-                throw new Error("405 Method Not Allowed!");
+            if (!Array.isArray(controller.methods[method])) {
+                var types = [controller.methods[method]];
             } else {
-                var _method = method;
-                if (!(method in controller.RESTfulMap) && method != "index")
-                    method = type.toLowerCase() + method;
-                return {
-                    name: uri,
-                    Class: controller.Class,
-                    method,
-                    params: getParams(origin, depth + 1),
-                    view: uri == "Home" ? method : `${uri}/${_method}`,
-                };
+                var types = controller.methods[method];
             }
+            for (let _type of types) {
+                if (_type == type) {
+                    var _method = method;
+                    if (!(method in controller.RESTfulMap) && method != "index")
+                        method = type.toLowerCase() + method;
+                    return {
+                        name: uri,
+                        Class: controller.Class,
+                        method,
+                        params: getParams(origin, depth + 1),
+                        view: uri == "Home" ? method : `${uri}/${_method}`,
+                    };
+                }
+            }
+            // If request method doesn't not match, throw 405 error.
+            throw new Error("405 Method Not Allowed!");
         } else {
             if (type == "GET" && controller.methods.index == type) {
                 // Call index() method.
@@ -92,6 +98,119 @@ function getHttpController(subdomain, type, uri, method = "", origin = null, dep
     }
 }
 
+function resolver(instance, method, req, res, resolve) {
+    if (instance[method].constructor.name == "GeneratorFunction") {
+        resolve(co(instance[method](req, res)));
+    } else {
+        resolve(instance[method](req, res));
+    }
+}
+
+function csrfTokenHandler(instance, subdomain, req, res) {
+    if (instance.csrfToken) {
+        if (req.method == "GET") {
+            // Define a setter to access and initiate CSRF token.
+            Object.defineProperty(req, "csrfToken", {
+                set: (v) => {},
+                get: () => {
+                    if (!req.__csrfToken) {
+                        if (!req.session.csrfTokens) {
+                            req.session.csrfTokens = {};
+                        }
+                        // Differ tokens by actions.
+
+                        var tokens = req.session.csrfTokens,
+                            token = randStr(64);
+                        req.__csrfToken = tokens[instance.action] = token;
+                        res.set("X-CSRF-Token", req.__csrfToken);
+                    }
+                    return req.__csrfToken;
+                }
+            });
+        } else if (EFFECT_METHODS.includes(req.method)) {
+            // Must send request header: referer. 
+            if (!req.headers.referer) {
+                throw new Error("403 Forbidden!");
+            }
+            var ref = req.headers.referer,
+                uri = url.parse(ref).pathname.substring(1),
+                // Parse referer and get old controller.
+                _controller = getHttpController(subdomain, "GET", uri),
+                action = _controller.name + "." + _controller.method,
+                name = "x-csrf-token",
+                tokens = req.session.csrfTokens,
+                token = tokens && tokens[action];
+            if (token === undefined ||
+                req.headers[name] != token &&
+                req.params[name] != token &&
+                req.query[name] != token &&
+                req.body[name] != token) {
+                throw new Error("403 Forbidden!");
+            } else {
+                // Make a reference to the token.
+                Object.defineProperty(req, "csrfToken", {
+                    set: (v) => {},
+                    get: () => token
+                });
+            }
+        }
+    }
+}
+
+function uploadHandler(instance, method, req, res, resolve) {
+    if (req.method == "POST" && instance.uploadConfig.fields.length) {
+        var fields = [];
+        for (let field of instance.uploadConfig.fields) {
+            fields.push({
+                name: field,
+                maxCount: instance.uploadConfig.maxCount
+            });
+        }
+        var date = (new DateTime).date,
+            savePath = `${instance.uploadConfig.savePath}/${date}`,
+            uploader = multer({
+                preservePath: true,
+                storage: multer.diskStorage({
+                    destination: (req, file, cb) => {
+                        if (!fs.existsSync(savePath)) {
+                            xmkdir(savePath);
+                        }
+                        cb(null, savePath);
+                    },
+                    filename: (req, file, cb) => {
+                        if (instance.uploadConfig.filename instanceof Function) {
+                            var filename = instance.uploadConfig.filename(file);
+                        } else if (instance.uploadConfig.filename === "random") {
+                            var extname = path.extname(file.originalname),
+                                filename = randStr(32) + extname;
+                        } else { // auto-increment
+                            var nextname = nextFilename(`${savePath}/${file.originalname}`),
+                                filename = path.basename(nextname);
+                        }
+                        cb(null, filename);
+                    }
+                }),
+                fileFilter: (req, file, cb) => {
+                    try {
+                        var pass = instance.uploadConfig.filter(file);
+                        cb(null, pass);
+                    } catch (err) {
+                        reject(err);
+                    }
+                }
+            }).fields(fields);
+        uploader(req, res, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolver(instance, method, req, res, resolve);
+            }
+        });
+    } else {
+        resolver(instance, method, req, res, resolve);
+    }
+}
+
 module.exports = (app) => {
     // Listen all URL at base level.
     app.all("*", (req, res) => {
@@ -116,16 +235,9 @@ module.exports = (app) => {
                 };
                 req.params = params;
 
-                function resolver(instance) {
-                    if (instance[method].constructor.name == "GeneratorFunction") {
-                        resolve(co(instance[method](req, res)));
-                    } else {
-                        resolve(instance[method](req, res));
-                    }
-                }
-
                 function next(instance) {
                     instance = instance || this;
+                    // Handle authentication.
                     if (instance.requireAuth && !instance.authorized) {
                         if (instance.fallbackTo) {
                             res.redirect(302, instance.fallbackTo);
@@ -134,6 +246,7 @@ module.exports = (app) => {
                             throw new Error("401 Unauthorized!");
                         }
                     } else if (Array.isArray(instance.urlParams)) {
+                        // Handle URL parameters.
                         for (let key in params) {
                             if (!instance.urlParams.includes(key)) {
                                 options = null; // Reset options.
@@ -142,47 +255,7 @@ module.exports = (app) => {
                         }
                     }
                     // Handle CSRF token.
-                    if (instance.csrfToken) {
-                        if (req.method == "GET") {
-                            // Define a setter to access and initiate CSRF token.
-                            Object.defineProperty(req, "csrfToken", {
-                                set: (v) => {},
-                                get: () => {
-                                    if (!req.__csrfToken) {
-                                        if (!req.session.csrfTokens) {
-                                            req.session.csrfTokens = {};
-                                        }
-                                        // Differ tokens by actions.
-
-                                        var tokens = req.session.csrfTokens,
-                                            token = randStr(64);
-                                        req.__csrfToken = tokens[instance.action] = token;
-                                        res.set("X-CSRF-Token", req.__csrfToken);
-                                    }
-                                    return req.__csrfToken;
-                                }
-                            });
-                        } else if (EFFECT_METHODS.includes(req.method)) {
-                            // Must send request header: referer. 
-                            if (!req.headers.referer) {
-                                throw new Error("403 Forbidden!");
-                            }
-                            var ref = req.headers.referer,
-                                uri = url.parse(ref).pathname.substring(1),
-                                // Parse referer and get old controller.
-                                _controller = getHttpController(subdomain, "GET", uri),
-                                action = _controller.name + "." + _controller.method,
-                                name = "x-csrf-token",
-                                token = req.session.csrfTokens && req.session.csrfTokens[action];
-                            if (token === undefined ||
-                                req.headers[name] != token &&
-                                req.params[name] != token &&
-                                req.query[name] != token &&
-                                req.body[name] != token) {
-                                throw new Error("403 Forbidden!");
-                            }
-                        }
-                    }
+                    csrfTokenHandler(instance, subdomain, req, res);
                     // Handle GZip.
                     var encodings = req.headers["accept-encoding"],
                         encoding = encodings && encodings.split(",")[0];
@@ -194,57 +267,7 @@ module.exports = (app) => {
                         res.jsonpCallback = req.query[instance.jsonp];
                     }
                     // Handle file uploading.
-                    if (req.method == "POST" && instance.uploadConfig.fields.length) {
-                        var fields = [];
-                        for (let field of instance.uploadConfig.fields) {
-                            fields.push({
-                                name: field,
-                                maxCount: instance.uploadConfig.maxCount
-                            });
-                        }
-                        var date = (new DateTime).date,
-                            savePath = `${instance.uploadConfig.savePath}/${date}`,
-                            uploader = multer({
-                                preservePath: true,
-                                storage: multer.diskStorage({
-                                    destination: (req, file, cb) => {
-                                        if (!fs.existsSync(savePath)) {
-                                            xmkdir(savePath);
-                                        }
-                                        cb(null, savePath);
-                                    },
-                                    filename: (req, file, cb) => {
-                                        if (instance.uploadConfig.filename instanceof Function) {
-                                            var filename = instance.uploadConfig.filename(file);
-                                        } else if (instance.uploadConfig.filename === "random") {
-                                            var extname = path.extname(file.originalname),
-                                                filename = randStr(16) + extname;
-                                        } else { // auto-increment
-                                            var nextname = nextFilename(`${savePath}/${file.originalname}`),
-                                                filename = path.basename(nextname);
-                                        }
-                                        cb(null, filename);
-                                    }
-                                }),
-                                fileFilter: (req, file, cb) => {
-                                    try {
-                                        var ok = instance.uploadConfig.filter(file);
-                                        cb(null, ok);
-                                    } catch (err) {
-                                        reject(err);
-                                    }
-                                }
-                            }).fields(fields);
-                        uploader(req, res, (err) => {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolver(instance);
-                            }
-                        });
-                    } else {
-                        resolver(instance);
-                    }
+                    uploadHandler(instance, method, req, res, resolve);
                 }
 
                 if (Class.prototype.constructor.length === 4) {

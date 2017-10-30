@@ -11,6 +11,7 @@
 5. If clients accept, thrown errors will be sent as JSON with 200 status.
 6. Jsonp is supported.
 7. CSRF Protection is supported.
+8. Fix a bug on visiting the same URL with different request method.
 
 ## 1.3.3
 

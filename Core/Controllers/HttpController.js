@@ -90,6 +90,8 @@ class HttpController extends Controller {
             maxCount: 1, // Max number of files that each field can carry.
             savePath: ROOT + "/" + path.dirname(this.viewPath) + "/Uploads",
             filter: (file) => true, // true: accept, false: reject.
+            // auto-increment, random or a function returns the final name.
+            filename: "auto-increment",
         };
     }
 

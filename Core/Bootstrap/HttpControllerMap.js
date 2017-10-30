@@ -39,8 +39,15 @@ for (let subdomain in ControllerMap) {
                         }
                     }
                 }
-                if (type)
-                    methods[prop] = type;
+                if (type) {
+                    if (!methods[prop]) {
+                        methods[prop] = type;
+                    } else if (!Array.isArray(methods[prop])) {
+                        methods[prop] = [methods[prop], type];
+                    } else {
+                        methods[prop].push(type);
+                    }
+                }
             }
         }
         HttpControllerMap[subdomain][name] = {
