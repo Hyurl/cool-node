@@ -8,6 +8,8 @@ const SocketController = require("../Controllers/SocketController");
 const Mail = require("../Tools/Mail");
 const Logger = require("../Tools/Logger");
 const DateTime = require("../Tools/DateTime");
+const Functions = require("../Tools/Functions");
+const MarkdownParser = require("../Tools/MarkdownParser");
 
 var loadCustomHandler = require("./CustomHandlerLoader");
 
@@ -134,4 +136,6 @@ module.exports = {
     Mail,
     Logger,
     DateTime,
+    MarkdownParser,
+    Functions
 };

@@ -2,19 +2,30 @@ const fs = require("fs");
 const path = require("path");
 const CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-/** Makes a string's first char upper-cased. */
-function ucfirst(str) {
-    return str[0].toUpperCase() + str.substring(1);
+/** 
+ * Makes a string's first char upper-cased.
+ * @param {String} text The original string.
+ */
+function ucfirst(text) {
+    return text[0].toUpperCase() + text.substring(1);
 }
 
-/** Generate a random integer. */
+/** 
+ * Generates a random integer.
+ * @param {Number} min The minimum number.
+ * @param {Number} max The maximum number (inclusive).
+ */
 function rand(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/** Generate a random string */
+/** 
+ * Generates a random string.
+ * @param {Number} length The string length.
+ * @param {String} chars The possible characters.
+ */
 function randStr(length = 5, chars = "") {
     chars = chars || CHARS;
     var str = "",
@@ -25,7 +36,11 @@ function randStr(length = 5, chars = "") {
     return str;
 }
 
-/** Copies a directory to a new location. */
+/** 
+ * Copies a directory/file to a new location synchronously.
+ * @param {String} src The original path.
+ * @param {String} dst The destination path.
+ */
 function xcopy(src, dst) {
     var stat = fs.statSync(src),
         dir = path.dirname(dst);
@@ -44,20 +59,28 @@ function xcopy(src, dst) {
     }
 }
 
-/** Makes directory recursively. */
-function xmkdir(dir) {
+/** 
+ * Makes directory recursively.
+ * @param {String} dir The directory path.
+ * @param {Number} mode Default is 0o777.
+ */
+function xmkdir(dir, mode = 0o777) {
     dir = path.normalize(dir).replace(/\\/g, "/").split("/");
     var _dir = [];
     for (var i = 0; i < dir.length; i++) {
         _dir.push(dir[i]);
         let dirname = _dir.join("/");
         if (dirname && !fs.existsSync(dirname)) {
-            fs.mkdirSync(dirname);
+            fs.mkdirSync(dirname, mode);
         }
     }
 }
 
-/** Gets a file's next filename when the file exists. */
+/** 
+ * Gets a file's next filename when the file exists.
+ * @param {String} filename The original filename.
+ * @param {String} extname Set a specified extension name.
+ */
 function nextFilename(filename, extname = "") {
     if (!fs.existsSync(filename)) {
         return filename;
@@ -83,4 +106,68 @@ function nextFilename(filename, extname = "") {
     }
 }
 
-module.exports = { ucfirst, rand, randStr, xcopy, xmkdir, nextFilename };
+/** 
+ * Escape HTML tags.
+ * @param {String} html HTML contents.
+ * @param {String|Array} tags Escape specified tags, default is 
+ *  <script><style><iframe>.
+ * @return {String} Escaped HTML contents.
+ */
+function escapeTags(html, tags = "<script><style><iframe>") {
+    tags = Array.isArray(tags) ? tags : tags.match(/[a-zA-Z0-9\-:]+/g);
+    for (let tag of tags) {
+        let re1 = new RegExp(`<${tag}\\s*>`, "gi"),
+            re2 = new RegExp(`<\\/${tag}\\s*>`, "gi"),
+            re3 = new RegExp(`<${tag}(.*)>`, "gi");
+        html = html.replace(re1, `&lt;${tag}&gt;`)
+            .replace(re2, `&lt;/${tag}&gt;`)
+            .replace(re3, match => {
+                return "&lt;" + match.substring(1, match.length - 1) + "&gt;";
+            });
+    }
+    return html;
+}
+
+
+/** 
+ * Escape event attributes.
+ * @param {String} html HTML contents.
+ * @return {String} Escaped HTML contents.
+ */
+function escapeEventAttributes(html) {
+    return html.replace(/\son[a-z]+\s*=\s*"\b/g, match => {
+        return " data-" + match.substring(1);
+    });
+}
+
+/** 
+ * Inject CSRF Token into forms.
+ * @param {String} html HTML contents.
+ * @param {String} token The CSRF token.
+ * @return {String} HTML contents with CSRF token in forms.
+ */
+function injectCsrfToken(html, token) {
+    var ele = `<input type="hidden" name="x-csrf-token" value="${token}">`,
+        matches = html.match(/<form .*>/g);
+    if (matches) {
+        for (let match of matches) {
+            let i = html.indexOf(match) + match.length,
+                j = html.indexOf("<", i),
+                spaces = html.substring(i, j);
+            html = html.substring(0, i) + spaces + ele + html.substring(i);
+        }
+    }
+    return html;
+}
+
+module.exports = {
+    ucfirst,
+    rand,
+    randStr,
+    xcopy,
+    xmkdir,
+    nextFilename,
+    escapeTags,
+    escapeEventAttributes,
+    injectCsrfToken
+};

@@ -1,4 +1,3 @@
-const fs = require("fs");
 const path = require("path");
 const ejs = require("ejs");
 const Logger = require("../Tools/Logger");
@@ -101,21 +100,8 @@ class Controller {
         tplName = tplName || this.defaultView;
         if (path.extname(tplName) === "")
             tplName += ".md";
-        return new Promise((resolve, reject) => {
-            var file = ROOT + "/" + this.viewPath + "/" + tplName;
-            fs.readFile(file, "utf8", (err, content) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    try {
-                        content = MarkdownParser(content);
-                        resolve(content);
-                    } catch (err) {
-                        reject(err);
-                    }
-                }
-            });
-        });
+        var filename = ROOT + "/" + this.viewPath + "/" + tplName;
+        return MarkdownParser.parseFile(filename);
     }
 
     /**

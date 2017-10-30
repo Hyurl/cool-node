@@ -1,5 +1,11 @@
 **This log starts from version 1.0.4.**
 
+## 1.3.5
+
+(2017-10-30 21:05 UTC+800)
+
+1. Delete token form session when set req.csrfToken to undefined.
+
 ## 1.3.4
 
 (2017-10-30 11:30 UTC+800)

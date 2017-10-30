@@ -1,3 +1,4 @@
+const fs = require("fs");
 const marked = require("marked");
 const hljs = require("highlightjs");
 const StringTrimmer = require("string-trimmer");
@@ -6,12 +7,13 @@ const renderer = new marked.Renderer();
 // Render markdown headings.
 renderer.heading = function(text, level) {
     var isLatin = Buffer.byteLength(text) == text.length,
-        _text = text.replace(/\s/g, '-');
+        _text = text.replace(/\s/g, '-'),
+        re = /[~`!@#\$%\^&\*\(\)\+=\{\}\[\]\|:"'<>,\.\?\/]/g;
     if (isLatin) {
         var matches = _text.match(/[\-0-9a-zA-Z]+/g),
-            id = matches ? matches.join("_") : _text.replace(/[~`!@#\$%\^&\*\(\)\+=\{\}\[\]\|:"'<>,\.\?\/]/g, "_");
+            id = matches ? matches.join("_") : _text.replace(re, "_");
     } else {
-        var id = _text.replace(/[~`!@#\$%\^&\*\(\)\+=\{\}\[\]\|:"'<>,\.\?\/]/g, "_");
+        var id = _text.replace(re, "_");
     }
     id = StringTrimmer.trim(id, "_");
     return `<h${level} id="${id}">
@@ -30,6 +32,39 @@ renderer.code = function(code, lang, escaped) {
 </pre>\n`;
 };
 
-module.exports = (content) => {
-    return marked(content, { renderer });
+/**
+ * A Tool to parse markdown contents.
+ */
+class MarkdownParser {
+    /**
+     * Parses markdown contents to HTML.
+     * @param {String} contents The contents that needs to be parsed.
+     */
+    static parse(contents) {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(marked(contents, { renderer }));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
+     * Parse a markdown file to HTML.
+     * @param {String} filename The markdown (*.md) filename.
+     */
+    static parseFile(filename) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(filename, 'utf8', (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.parse(data));
+                }
+            });
+        });
+    }
 }
+
+module.exports = MarkdownParser;
