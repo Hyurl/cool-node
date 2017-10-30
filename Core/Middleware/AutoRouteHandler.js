@@ -149,8 +149,11 @@ function csrfTokenHandler(instance, subdomain, req, res) {
             } else {
                 // Make a reference to the token.
                 Object.defineProperty(req, "csrfToken", {
-                    set: (v) => {},
-                    get: () => token
+                    set: (v) => {
+                        if (v === null || v === undefined)
+                            delete tokens[action];
+                    },
+                    get: () => tokens[action]
                 });
             }
         }
