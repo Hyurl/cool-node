@@ -2,10 +2,10 @@
 
 ## 1.3.4
 
-(2017-10-30 8:00 UTC+800)
+(2017-10-30 11:30 UTC+800)
 
 1. Uploaded filename could be random or user-defined.
-2. Socket clients automatically joins into the room of the subdomain app.
+2. Socket clients automatically join into the room of the subdomain app.
 3. Generator methods (*/yield) are supported in controllers.
 4. More error handling policy, `error`  object will be passed to error pages.
 5. If clients accept, thrown errors will be sent as JSON with 200 status.
