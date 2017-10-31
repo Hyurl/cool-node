@@ -1,7 +1,9 @@
 const path = require("path");
+const util = require("util");
 const ejs = require("ejs");
 const Logger = require("../Tools/Logger");
 const MarkdownParser = require("../Tools/MarkdownParser");
+const LocalesMap = require("../Bootstrap/LocaleMap");
 
 // Configure EJS delimiter.
 if (typeof config.view == "object") {
@@ -21,10 +23,16 @@ class Controller {
      * @param  {Object}  options  Options for initiation.
      */
     constructor(options) {
+        // The subdomain of the current app.
+        this.subdomain = options.subdomain || "www";
+        // The path of the current app.
+        this.appPath = options.appPath || "App";
+
         // ViewPath, defaultView, action and actionName will be auto set 
         // properly by the framework when a request event fires.
         this.viewPath = options.viewPath || "App/Views";
         this.defaultView = options.defaultView || "index";
+
         // Full called method name (including class path).
         this.action = options.action;
         // Called method name.
@@ -36,6 +44,13 @@ class Controller {
 
         // This property indicates whether the operation is authorized.
         this.authorized = false;
+
+        // The accepting language of the current client.
+        this.lang = options.lang || "en-US";
+        // Set a default language, all languages must reference to the default
+        // language, and when the request language doesn't exist, fallback to 
+        // the default one.
+        this.defaultLang = "en-US";
 
         // Configurations for Logger tool.
         this.logConfig = {
@@ -71,6 +86,11 @@ class Controller {
             tplName += ".html";
         return new Promise((resolve, reject) => {
             var file = ROOT + "/" + this.viewPath + "/" + tplName;
+            if (!("i18n" in vars)) {
+                vars.i18n = (...text) => {
+                    return this.i18n(...text);
+                };
+            }
             ejs.renderFile(file, vars, {}, (err, content) => {
                 if (err) {
                     reject(err);
@@ -157,14 +177,39 @@ class Controller {
             if (conf.filename) {
                 var filename = conf.filename;
             } else {
-                var appPath = path.dirname(`${ROOT}/${this.viewPath}`),
-                    filename = appPath + "/Logs/cool-node.log";
+                var filename = this.appPath + "/Logs/cool-node.log";
             }
             this.__logger = new Logger(filename, this.action);
             this.__logger.fileSize = conf.fileSize || 1024 * 1024 * 2;
             this.__logger.mailTo = conf.mailTo;
         }
         return this.__logger;
+    }
+
+    /**
+     * Gets a locale text via i18n. 
+     * 
+     * If is a HTTP request, check `req.query.lang` or `req.cookies.lang`, if 
+     * is socket message, check `socket.cookies.lang`, if any appears, then 
+     * always use the setting language, otherwise, check header 
+     * `Accept-Language` instead. Language files are stored in `App/Locales`, 
+     * could be json or js, and case insensitive.
+     * 
+     * @param  {String}  text  The original text, accept multiple arguments 
+     *  and format with %s, %i, etc.
+     * 
+     * @return {String}  The final text.
+     */
+    i18n(...text) {
+        var locale = LocalesMap[this.subdomain],
+            lang = this.lang.toLowerCase(),
+            _lang = this.defaultLang.toLowerCase();
+        if (locale[lang] && locale[lang][text[0]]) {
+            text[0] = locale[lang][text[0]];
+        } else if (locale[_lang] && locale[_lang][0]) {
+            text[0] = locale[_lang][text[0]];
+        }
+        return util.format(...text);
     }
 }
 

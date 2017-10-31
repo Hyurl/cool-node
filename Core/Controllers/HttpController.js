@@ -75,7 +75,7 @@ class HttpController extends Controller {
         this.urlParams = null;
 
         // Set a callback name for jsonp, false means disabled.
-        this.jsonp = "callback";
+        this.jsonp = false;
 
         // Enable token checking, if true, when request method is DELETE, 
         // PATCH, POST or PUT, the client must send a `x-csrf-token` field to 

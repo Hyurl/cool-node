@@ -5,6 +5,9 @@
 (2017-10-31 14:00 UTC+800)
 
 1. XSS protection supported, CSRF protection improved.
+2. I18n supported.
+3. Change the way to launch the server.
+4. Cookie parsed for both HTTP and socket.
 
 ## 1.3.4
 

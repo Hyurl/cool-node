@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const app = express();
 const session = require("express-session")(config.session);
+const cookieParser = require("cookie-parser")(config.session.secret);
 const SocketIO = require("socket.io");
 const version = require("../../package.json").version;
 const HttpController = require("../Controllers/HttpController");
@@ -33,9 +34,13 @@ require("../Middleware/HttpsRedirector")(app);
 require("../Middleware/HttpSubdomainHandler")(app);
 // Handle static resources.
 require("../Middleware/StaticResourceHandler")(app, express);
+// Parse cookies.
+app.use(cookieParser);
 // Parse request body.
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// Handle accept language.
+require("../Middleware/HttpLanguageHandler")(app);
 // Handler XML.
 require("../Middleware/HttpXMLHandler")(app);
 // Handle sessions.
@@ -83,7 +88,9 @@ function startSocketServer(io, name = "") {
     require("../Middleware/SocketPropsHandler")(io);
     // Handle subdomain requests.
     require("../Middleware/SocketSubdomainHandler")(io);
-    // Handle sessions.
+    // Handle cookies.
+    require("../Middleware/SocketCookieHandler")(io, cookieParser);
+        // Handle sessions.
     require("../Middleware/SocketSessionHandler")(io, session);
     // Handle database connection.
     require("../Middleware/SocketDBHandler")(io);

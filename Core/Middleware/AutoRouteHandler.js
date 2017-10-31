@@ -231,10 +231,13 @@ module.exports = (app) => {
             try {
                 var { name, Class, method, params, view } = getHttpController(subdomain, req.method, uri);
                 options = {
+                    subdomain,
+                    appPath: subdomain == "www" ? "App" : `App.${subdomain}`,
                     viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                     defaultView: view,
                     action: name + "." + method,
-                    actionName: method
+                    actionName: method,
+                    lang: req.query.lang || req.cookies.lang || req.lang
                 };
                 req.params = params;
 
@@ -326,8 +329,11 @@ module.exports = (app) => {
                 var url = req.url;
             }
             var controller = new Controller(options || {
+                subdomain,
+                appPath: subdomain == "www" ? "App" : `App.${subdomain}`,
                 viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
-                action: `${req.method} ${url}`
+                action: `${req.method} ${url}`,
+                lang: req.lang
             });
             if (!stack && error.indexOf(`${code}: `) === 0) {
                 // If error message is with the style '<code>: message', 

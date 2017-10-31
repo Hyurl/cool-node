@@ -14,10 +14,13 @@ module.exports = (io) => {
         for (let controller of SocketControllerMap[subdomain]) {
             let { event, Class, method } = controller;
             let options = {
+                subdomain,
+                appPath: subdomain == "www" ? "App" : `App.${subdomain}`,
                 viewPath: subdomain == "www" ? "App/Views" : `App.${subdomain}/Views`,
                 defaultView: event,
                 action: path.dirname(event) + "." + method,
-                actionName: method
+                actionName: method,
+                lang: socket.cookies.lang || socket.lang
             };
             socket.on(event, (...data) => {
                 // Handle the procedure in a Promise context.
