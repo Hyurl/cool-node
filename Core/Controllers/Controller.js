@@ -57,6 +57,7 @@ class Controller {
             filename: "",
             fileSize: 0,
             mailTo: "",
+            ttl: 1000,
         }
     }
 
@@ -182,6 +183,7 @@ class Controller {
             this.__logger = new Logger(filename, this.action);
             this.__logger.fileSize = conf.fileSize || 1024 * 1024 * 2;
             this.__logger.mailTo = conf.mailTo;
+            this.__logger.ttl = conf.ttl;
         }
         return this.__logger;
     }

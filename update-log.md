@@ -8,6 +8,8 @@
 2. I18n supported.
 3. Change the way to launch the server.
 4. Cookie parsed for both HTTP and socket.
+5. Logging system more efficient.
+6. More tools added.
 
 ## 1.3.4
 
