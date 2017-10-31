@@ -2,14 +2,15 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const app = express();
 const session = require("express-session")(config.session);
+const SocketIO = require("socket.io");
 const version = require("../../package.json").version;
 const HttpController = require("../Controllers/HttpController");
 const SocketController = require("../Controllers/SocketController");
 const Mail = require("../Tools/Mail");
 const Logger = require("../Tools/Logger");
 const DateTime = require("../Tools/DateTime");
-const Functions = require("../Tools/Functions");
 const MarkdownParser = require("../Tools/MarkdownParser");
+const Functions = require("../Tools/Functions");
 
 var loadCustomHandler = require("./CustomHandlerLoader");
 
@@ -41,50 +42,43 @@ require("../Middleware/HttpXMLHandler")(app);
 app.use(session);
 // Handle database connection.
 require("../Middleware/HttpDBHandler")(app);
-// Load user-defined middleware.
-loadCustomHandler(ROOT + "/Middleware/http", app);
-// Load pre-defined middleware.
-require("../Middleware/HttpAuthHandler")(app);
-require("../Middleware/AutoRouteHandler")(app);
 
 var httpServer = null,
     httpsServer = null,
     wsServer = null,
-    wssServer = null;
+    wssServer = null,
+    hostname = Array.isArray(config.server.host) ? config.server.host[0] : config.server.host;
 
-var hostname = Array.isArray(config.server.host) ? config.server.host[0] : config.server.host;
+exports = module.exports = {
+    version,
+    ROOT,
+    config,
+    hostname,
+    HttpController,
+    SocketController,
+    Mail,
+    Logger,
+    DateTime,
+    MarkdownParser,
+    Functions,
+    app,
+    httpServer,
+    httpsServer,
+    wsServer,
+    wssServer,
+    startServer,
+    startSocketServer
+};
 
-// Start HTTP server.
-httpServer = require("http").Server(app);
-httpServer.setTimeout(config.server.timeout || 30000);
-httpServer.listen(config.server.port, (err) => {
-    if (err) {
-        throw err;
-        process.exit(1);
-    }
-    var port = httpServer.address().port,
-        host = `${hostname}` + (port != 80 ? `:${port}` : "");
-    console.log("HTTP Server started, please visit http://%s.", host);
-});
+global.wsServer = wsServer;
+global.wssServer = wssServer;
 
-if (config.server.https.port) {
-    // Start HTTPS server.
-    httpsServer = require("https").Server(config.server.https.credentials, app);
-    httpsServer.setTimeout(config.server.timeout || 30000);
-    httpsServer.listen(config.server.https.port, (err) => {
-        if (err) {
-            throw err;
-            process.exit(1);
-        }
-        var port = httpsServer.address().port,
-            host = `${hostname}` + (port != 443 ? `:${port}` : "");
-        console.log("HTTPS Server started, please visit https://%s.", host);
-    });
-}
-
-// Start WebSocket server.
-const SocketIO = require("socket.io");
-var initWSServer = (io) => {
+/**
+ * Start a WebSocket Server.
+ * @param {Object} io A Socket.io instance.
+ * @param {String} name Make a reference name to the global.
+ */
+function startSocketServer(io, name = "") {
     // Handle properties.
     require("../Middleware/SocketPropsHandler")(io);
     // Handle subdomain requests.
@@ -98,44 +92,65 @@ var initWSServer = (io) => {
     // Load pre-defined middleware.
     require("../Middleware/SocketAuthHandler")(io);
     require("../Middleware/AutoSocketHandler")(io);
+    if (name) {
+        global[name] = io;
+    }
 };
 
-if (!config.server.socket) {
-    config.server.socket = require("../../config").server.socket || { autoStart: true };
-}
+/**
+ * Start HTTP server and socket server (if configurations enabled).
+ */
+function startServer() {
+    // Load user-defined middleware.
+    loadCustomHandler(ROOT + "/Middleware/http", app);
+    // Load pre-defined middleware.
+    require("../Middleware/HttpAuthHandler")(app);
+    require("../Middleware/AutoRouteHandler")(app);
 
-if (config.server.socket.autoStart) {
-    if (!httpsServer || !config.server.https.forceRedirect) {
-        // Listen WS protocol.
-        wsServer = SocketIO(httpServer, config.server.socket.options);
-        initWSServer(wsServer);
+    // Start HTTP server.
+    exports.httpServer = require("http").Server(app);
+    exports.httpServer.setTimeout(config.server.timeout || 30000);
+    exports.httpServer.listen(config.server.port, (err) => {
+        if (err) {
+            throw err;
+            process.exit(1);
+        }
+        var port = exports.httpServer.address().port,
+            host = `${hostname}` + (port != 80 ? `:${port}` : "");
+        console.log("HTTP Server started, please visit http://%s.", host);
+    });
+
+    if (config.server.https.port) {
+        // Start HTTPS server.
+        exports.httpsServer = require("https").Server(config.server.https.credentials, app);
+        exports.httpsServer.setTimeout(config.server.timeout || 30000);
+        exports.httpsServer.listen(config.server.https.port, (err) => {
+            if (err) {
+                throw err;
+                process.exit(1);
+            }
+            var port = exports.httpsServer.address().port,
+                host = `${hostname}` + (port != 443 ? `:${port}` : "");
+            console.log("HTTPS Server started, please visit https://%s.", host);
+        });
     }
 
-    if (httpsServer) {
-        // Listen WSS protocol.
-        wssServer = SocketIO(httpsServer, config.server.socket.options);
-        initWSServer(wssServer);
+    // Start WebSocket server.
+    if (!config.server.socket) {
+        config.server.socket = require("../../config").server.socket || { autoStart: true };
+    }
+
+    if (config.server.socket.autoStart) {
+        if (!exports.httpsServer || !config.server.https.forceRedirect) {
+            // Listen WS protocol.
+            exports.wsServer = SocketIO(exports.httpServer, config.server.socket.options);
+            startSocketServer(exports.wsServer, "wsServer");
+        }
+
+        if (exports.httpsServer) {
+            // Listen WSS protocol.
+            exports.wssServer = SocketIO(exports.httpsServer, config.server.socket.options);
+            startSocketServer(exports.wssServer, "wssServer");
+        }
     }
 }
-
-global.wsServer = wsServer;
-global.wssServer = wssServer;
-
-module.exports = {
-    version,
-    ROOT,
-    config,
-    app,
-    httpServer,
-    httpsServer,
-    wsServer,
-    wssServer,
-    initWSServer,
-    HttpController,
-    SocketController,
-    Mail,
-    Logger,
-    DateTime,
-    MarkdownParser,
-    Functions
-};

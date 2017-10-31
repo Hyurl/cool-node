@@ -21,5 +21,6 @@ if (!fs.existsSync(`${proDir}/config.js`)) {
 }
 if (!fs.existsSync(`${proDir}/index.js`)) {
     // Write index.js
-    fs.writeFileSync(`${proDir}/index.js`, `const CoolNode = require("cool-node");`);
+    var data = `const CoolNode = require("cool-node");\nCoolNode.startServer();`;
+    fs.writeFileSync(`${proDir}/index.js`, data);
 }

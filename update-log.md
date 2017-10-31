@@ -1,10 +1,10 @@
 **This log starts from version 1.0.4.**
 
-## 1.3.5
+## 1.3.5 beta
 
-(2017-10-30 21:05 UTC+800)
+(2017-10-31 14:00 UTC+800)
 
-1. Delete token form session when set req.csrfToken to undefined.
+1. XSS protection supported, CSRF protection improved.
 
 ## 1.3.4
 

@@ -138,15 +138,13 @@ class Controller {
      *  - `success` Indicates if the action is successful, always false.
      *  - `code` The same `code` given above.
      *  - `error` The error message, same as `msg`.
-     *  - `msg` The same `msg` given above, deprecated.
      */
     error(msg, code = 500) {
         msg = msg instanceof Error ? msg.message : msg;
         return {
             success: false,
             code,
-            error: msg,
-            msg,
+            error: msg
         };
     }
 
