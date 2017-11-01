@@ -10,6 +10,7 @@
 4. Cookie parsed for both HTTP and socket.
 5. Logging system more efficient.
 6. More tools added.
+7. Support methods extended from parent controller.
 
 ## 1.3.4
 

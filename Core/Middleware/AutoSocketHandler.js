@@ -11,8 +11,9 @@ module.exports = (io) => {
             return socket.disconnect(true);
         }
         // Bind all socket controllers to the events of underlying socket.
-        for (let controller of SocketControllerMap[subdomain]) {
-            let { event, Class, method } = controller;
+        for (let event in SocketControllerMap[subdomain]) {
+            let controller = SocketControllerMap[subdomain][event],
+                { Class, method } = controller;
             let options = {
                 subdomain,
                 appPath: subdomain == "www" ? "App" : `App.${subdomain}`,

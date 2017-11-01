@@ -1,4 +1,5 @@
 const ControllerMap = require("./ControllerMap");
+const HttpController = require("../Controllers/HttpController");
 
 var HttpControllerMap = {};
 var Types = [
@@ -13,16 +14,10 @@ var Types = [
     "trace"
 ];
 
-// Get all HTTP controllers.
-for (let subdomain in ControllerMap) {
-    let controllers = ControllerMap[subdomain]["http"];
-    for (let name in controllers) {
-        if (!HttpControllerMap[subdomain])
-            HttpControllerMap[subdomain] = {};
-        let proto = controllers[name].prototype,
-            props = Object.getOwnPropertyNames(proto),
-            methods = {},
-            RESTfulMap = controllers[name].prototype.RESTfulMap;
+function walkPrototypeChain(proto, methods, RESTfulMap, depth = 0) {
+    if (proto instanceof HttpController) {
+        var _proto = !depth ? proto : proto.__proto__,
+            props = Object.getOwnPropertyNames(_proto);
         for (let prop of props) {
             if (prop != "constructor" && (proto[prop] instanceof Function)) {
                 let type;
@@ -42,14 +37,27 @@ for (let subdomain in ControllerMap) {
                 if (type) {
                     if (!methods[prop]) {
                         methods[prop] = type;
-                    } else if (!Array.isArray(methods[prop])) {
+                    } else if (!Array.isArray(methods[prop]) && methods[prop] != type) {
                         methods[prop] = [methods[prop], type];
-                    } else {
+                    } else if (Array.isArray(methods[prop]) && !methods[prop].includes(type)) {
                         methods[prop].push(type);
                     }
                 }
             }
         }
+        walkPrototypeChain(_proto, methods, RESTfulMap, depth += 1);
+    }
+}
+
+// Get all HTTP controllers.
+for (let subdomain in ControllerMap) {
+    let controllers = ControllerMap[subdomain]["http"];
+    for (let name in controllers) {
+        if (!HttpControllerMap[subdomain])
+            HttpControllerMap[subdomain] = {};
+        let methods = {},
+            RESTfulMap = controllers[name].prototype.RESTfulMap;
+        walkPrototypeChain(controllers[name].prototype, methods, RESTfulMap);
         HttpControllerMap[subdomain][name] = {
             Class: controllers[name],
             methods,

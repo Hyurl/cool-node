@@ -8,6 +8,7 @@ const version = require("../../package.json").version;
 const HttpController = require("../Controllers/HttpController");
 const SocketController = require("../Controllers/SocketController");
 const Mail = require("../Tools/Mail");
+const TempStorage = require("../Tools/TempStorage");
 const Logger = require("../Tools/Logger");
 const DateTime = require("../Tools/DateTime");
 const MarkdownParser = require("../Tools/MarkdownParser");
@@ -62,6 +63,7 @@ exports = module.exports = {
     HttpController,
     SocketController,
     Mail,
+    TempStorage,
     Logger,
     DateTime,
     MarkdownParser,
@@ -90,7 +92,7 @@ function startSocketServer(io, name = "") {
     require("../Middleware/SocketSubdomainHandler")(io);
     // Handle cookies.
     require("../Middleware/SocketCookieHandler")(io, cookieParser);
-        // Handle sessions.
+    // Handle sessions.
     require("../Middleware/SocketSessionHandler")(io, session);
     // Handle database connection.
     require("../Middleware/SocketDBHandler")(io);
