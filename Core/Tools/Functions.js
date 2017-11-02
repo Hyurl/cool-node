@@ -133,7 +133,7 @@ function escapeTags(html, tags = "<script><style><iframe><object><embed>") {
  * @param {String} html HTML contents.
  * @return {String} Escaped HTML contents.
  */
-function escapeJsHrefs(html) {
+function escapeScriptHrefs(html) {
     return html.replace(/\shref\s*=["'\s]*javascript:/gi, match => {
         return match.replace("href", "data-href");
     });
