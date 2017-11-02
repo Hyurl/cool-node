@@ -75,7 +75,7 @@ class Channel {
      */
     static emit(event, ...data) {
         if (cluster.isMaster) {
-            return this.emit(event, ...data);
+            return this.broadcast(event, ...data);
         } else {
             process.send({ event, data });
         }
