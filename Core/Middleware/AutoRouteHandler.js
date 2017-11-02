@@ -4,6 +4,7 @@ const zlib = require("zlib");
 const url = require("url");
 const multer = require("multer");
 const co = require("co");
+const StringTrimmer = require("string-trimmer");
 const Controller = require("../Controllers/Controller");
 const HttpControllerMap = require("../Bootstrap/HttpControllerMap");
 const initConfig = require("../../config");
@@ -221,7 +222,7 @@ module.exports = (app) => {
         var _url = path.normalize(req.url).replace(/\\\\|\\/g, "/"),
             _path = path.normalize(req.path).replace(/\\\\|\\/g, "/"),
             subdomain = req.subdomain,
-            uri = _path.substring(1),
+            uri = StringTrimmer.trim(_path, "/"), //_path.substring(1),
             options = null;
         if (uri == "Home" || uri.indexOf("Home/") === 0) {
             res.redirect(301, _url.replace("/Home", "") || "/");
