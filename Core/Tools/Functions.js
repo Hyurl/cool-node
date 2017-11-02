@@ -110,10 +110,10 @@ function nextFilename(filename, extname = "") {
  * Escape HTML tags.
  * @param {String} html HTML contents.
  * @param {String|Array} tags Escape specified tags, default is 
- *  <script><style><iframe>.
+ *  <script><style><iframe><object><embed>.
  * @return {String} Escaped HTML contents.
  */
-function escapeTags(html, tags = "<script><style><iframe>") {
+function escapeTags(html, tags = "<script><style><iframe><object><embed>") {
     tags = Array.isArray(tags) ? tags : tags.match(/[a-zA-Z0-9\-:]+/g);
     for (let tag of tags) {
         let re1 = new RegExp(`<${tag}\\s*>`, "gi"),
@@ -128,6 +128,16 @@ function escapeTags(html, tags = "<script><style><iframe>") {
     return html;
 }
 
+/**
+ * Escape JavaScript Hrefs.
+ * @param {String} html HTML contents.
+ * @return {String} Escaped HTML contents.
+ */
+function escapeJsHrefs(html) {
+    return html.replace(/\shref\s*=["'\s]*javascript:/gi, match => {
+        return match.replace("href", "data-href");
+    });
+}
 
 /** 
  * Escape event attributes.
@@ -135,7 +145,7 @@ function escapeTags(html, tags = "<script><style><iframe>") {
  * @return {String} Escaped HTML contents.
  */
 function escapeEventAttributes(html) {
-    return html.replace(/\son[a-z]+\s*=\s*"\b/g, match => {
+    return html.replace(/\son[a-z]+\s*=/gi, match => {
         return " data-" + match.substring(1);
     });
 }
@@ -168,6 +178,7 @@ module.exports = {
     xmkdir,
     nextFilename,
     escapeTags,
+    escapeJsHrefs,
     escapeEventAttributes,
     injectCsrfToken
 };
