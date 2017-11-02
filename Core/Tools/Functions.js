@@ -178,7 +178,7 @@ module.exports = {
     xmkdir,
     nextFilename,
     escapeTags,
-    escapeJsHrefs,
+    escapeScriptHrefs,
     escapeEventAttributes,
     injectCsrfToken
 };
