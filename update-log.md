@@ -11,6 +11,7 @@
 5. Logging system more efficient.
 6. More tools added.
 7. Support methods extended from parent controller.
+8. Multi-processes supported.
 
 ## 1.3.4
 

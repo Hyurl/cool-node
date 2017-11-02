@@ -1,8 +1,8 @@
 const express = require("express");
-const bodyParser = require('body-parser');
 const app = express();
 const session = require("express-session")(config.session);
 const cookieParser = require("cookie-parser")(config.session.secret);
+const bodyParser = require('body-parser');
 const SocketIO = require("socket.io");
 const version = require("../../package.json").version;
 const HttpController = require("../Controllers/HttpController");
@@ -13,41 +13,44 @@ const Logger = require("../Tools/Logger");
 const DateTime = require("../Tools/DateTime");
 const MarkdownParser = require("../Tools/MarkdownParser");
 const Functions = require("../Tools/Functions");
+const Channel = require("../Tools/Channel");
 
-var loadCustomHandler = require("./CustomHandlerLoader");
+require("./ClusterManager"); // Manage cluster/multi-processes.
 
-// Initial headers.
-app.set("x-powered-by", false);
-if (config.server.showInfo || config.server.showInfo === undefined) {
-    var expressVersion = require("express/package.json").version;
-    app.use((req, res, next) => {
-        res.set({
-            "Server": `Express/${expressVersion} Node.js/${process.version}`,
-            "X-Powered-By": `Cool-Node/${version}`
+if (Channel.isWorker || !config.server.workers) {
+    var loadCustomHandler = require("./CustomHandlerLoader");
+    // Initial headers.
+    app.set("x-powered-by", false);
+    if (config.server.showInfo || config.server.showInfo === undefined) {
+        var expressVersion = require("express/package.json").version;
+        app.use((req, res, next) => {
+            res.set({
+                "Server": `Express/${expressVersion} Node.js/${process.version}`,
+                "X-Powered-By": `Cool-Node/${version}`
+            });
+            next();
         });
-        next();
-    });
+    }
+    // Auto-redirect HTTP to HTTPS.
+    require("../Middleware/HttpsRedirector")(app);
+    // Handle subdomain requests.
+    require("../Middleware/HttpSubdomainHandler")(app);
+    // Handle static resources.
+    require("../Middleware/StaticResourceHandler")(app, express);
+    // Parse cookies.
+    app.use(cookieParser);
+    // Parse request body.
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    // Handle accept language.
+    require("../Middleware/HttpLanguageHandler")(app);
+    // Handler XML.
+    require("../Middleware/HttpXMLHandler")(app);
+    // Handle sessions.
+    app.use(session);
+    // Handle database connection.
+    require("../Middleware/HttpDBHandler")(app);
 }
-
-// Auto-redirect HTTP to HTTPS.
-require("../Middleware/HttpsRedirector")(app);
-// Handle subdomain requests.
-require("../Middleware/HttpSubdomainHandler")(app);
-// Handle static resources.
-require("../Middleware/StaticResourceHandler")(app, express);
-// Parse cookies.
-app.use(cookieParser);
-// Parse request body.
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-// Handle accept language.
-require("../Middleware/HttpLanguageHandler")(app);
-// Handler XML.
-require("../Middleware/HttpXMLHandler")(app);
-// Handle sessions.
-app.use(session);
-// Handle database connection.
-require("../Middleware/HttpDBHandler")(app);
 
 var httpServer = null,
     httpsServer = null,
@@ -68,6 +71,9 @@ exports = module.exports = {
     DateTime,
     MarkdownParser,
     Functions,
+    Channel,
+    isMaster: Channel.isMaster,
+    isWorker: Channel.isWorker,
     app,
     httpServer,
     httpsServer,
@@ -86,6 +92,8 @@ global.wssServer = wssServer;
  * @param {String} name Make a reference name to the global.
  */
 function startSocketServer(io, name = "") {
+    if (config.server.workers && !Channel.isWorker)
+        return;
     // Handle properties.
     require("../Middleware/SocketPropsHandler")(io);
     // Handle subdomain requests.
@@ -110,6 +118,8 @@ function startSocketServer(io, name = "") {
  * Start HTTP server and socket server (if configurations enabled).
  */
 function startServer() {
+    if (config.server.workers && !Channel.isWorker)
+        return;
     // Load user-defined middleware.
     loadCustomHandler(ROOT + "/Middleware/http", app);
     // Load pre-defined middleware.

@@ -5,6 +5,7 @@ const util = require("util");
 const Mail = require("./Mail");
 const DateTime = require("./DateTime");
 const TempStorage = require("./TempStorage");
+const Channel = require("./Channel");
 const { nextFilename } = require("../Tools/Functions");
 const { EOL } = require("os");
 
@@ -31,6 +32,19 @@ class Logger {
 
     /** Outputs a message to the log file. */
     __output(level, ...msg) {
+        if (Channel.isWorker) {
+            Channel.emit("log", {
+                filename: this.filename,
+                fileSize: this.fileSize,
+                ttl: this.ttl,
+                mailTo: this.mailTo,
+                action: this.action,
+                level,
+                msg
+            });
+            return;
+        }
+
         // Get time info.
         var dateTime = new DateTime;
         var timeStr = dateTime.toString();

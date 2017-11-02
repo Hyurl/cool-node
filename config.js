@@ -9,6 +9,7 @@ module.exports = {
         port: 80,
         timeout: 120000, // 2 min.
         showInfo: true, // Show headers like Server and X-Powered-By.
+        workers: 0, // Children processes, not more than CPU count.
         https: {
             port: 0, // If set, start a HTTPS server.
             forceRedirect: true, // If true, always redirect HTTP to HTTPS.
