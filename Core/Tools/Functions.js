@@ -60,7 +60,7 @@ function xcopy(src, dst) {
 }
 
 /** 
- * Makes directory recursively.
+ * Makes directories recursively.
  * @param {String} dir The directory path.
  * @param {Number} mode Default is 0o777.
  */
