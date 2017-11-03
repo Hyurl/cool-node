@@ -107,7 +107,7 @@ function nextFilename(filename, extname = "") {
 }
 
 /** 
- * Escape HTML tags.
+ * Escapes HTML tags.
  * @param {String} html HTML contents.
  * @param {String|Array} tags Escape specified tags, default is 
  *  <script><style><iframe><object><embed>.
@@ -129,7 +129,7 @@ function escapeTags(html, tags = "<script><style><iframe><object><embed>") {
 }
 
 /**
- * Escape JavaScript Hrefs.
+ * Escapes JavaScript Hrefs.
  * @param {String} html HTML contents.
  * @return {String} Escaped HTML contents.
  */
@@ -140,7 +140,7 @@ function escapeScriptHrefs(html) {
 }
 
 /** 
- * Escape event attributes.
+ * Escapes event attributes.
  * @param {String} html HTML contents.
  * @return {String} Escaped HTML contents.
  */
@@ -151,7 +151,7 @@ function escapeEventAttributes(html) {
 }
 
 /** 
- * Inject CSRF Token into forms.
+ * Injects CSRF Token into forms.
  * @param {String} html HTML contents.
  * @param {String} token The CSRF token.
  * @return {String} HTML contents with CSRF token in forms.
