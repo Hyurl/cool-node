@@ -10,6 +10,14 @@ function ucfirst(text) {
     return text[0].toUpperCase() + text.substring(1);
 }
 
+/**
+ * Capitalizes every words of a sentence.
+ * @param {String} text The original string.
+ */
+function capitalize(text) {
+    return ucfirst(text.replace(/\b[a-z]/g, char => char.toUpperCase()));
+}
+
 /** 
  * Generates a random integer.
  * @param {Number} min The minimum number.
