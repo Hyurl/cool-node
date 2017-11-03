@@ -11,7 +11,7 @@ function ucfirst(text) {
 }
 
 /**
- * Capitalizes every words of a sentence.
+ * Capitalizes every word of a sentence.
  * @param {String} text The original string.
  */
 function capitalize(text) {
