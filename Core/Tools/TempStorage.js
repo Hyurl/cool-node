@@ -17,11 +17,11 @@ class TempStorage {
      *  - `ttl` Time to live, default is `1000`ms.
      *  - `filename` A disk file for storing expired data, if missing, data 
      *      will be discard.
-     *  - `fileSize` Maxmum size of the output file.
+     *  - `fileSize` Maximum size of the output file.
      *  - `fileLimit` A function called when the output file's size up to 
      *      limit, rewrite by default.
-     *  - `error` An error handler called when any error occured in the 
-     *      asynchorouns timeout scope.
+     *  - `error` An error handler called when any error occurred in the 
+     *      asynchronous timeout scope.
      * 
      *  If this parameter is passed as a string, then it will be treated as 
      *  both `id` and `filename`.
