@@ -1,3 +1,6 @@
+/**
+ * A tool to get the current date and time.
+ */
 class DateTime extends Date {
     constructor(...args) {
         super(...args);
@@ -28,17 +31,17 @@ class DateTime extends Date {
      * Returns a string representation of a date. The format of the string 
      * depends on the locale. 
      */
-    toString(){
+    toString() {
         return `${this.date} ${this.time}`;
     }
 
     /** Returns a date as a string value. */
-    toDateString(){
+    toDateString() {
         return this.date;
     }
 
     /** Returns a time as a string value. */
-    toTimeString(){
+    toTimeString() {
         return this.time;
     }
 }
