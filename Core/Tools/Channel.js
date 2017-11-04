@@ -83,7 +83,7 @@ class Channel {
 
     /**
      * Emit a message to a specified worker process.
-     * @param {Number} id Could be either a worker id or a pid.
+     * @param {Number|String} id The worker id or pid, or the worker code.
      * @param {String} event The event name.
      * @param {Any} data A list of data, they will be received by the event 
      *  listener.
@@ -97,6 +97,10 @@ class Channel {
                 for (let _id in cluster.workers) {
                     if (cluster.workers[_id].process.pid === id) {
                         cluster.workers[_id].send({ event, data });
+                        break;
+                    } else if (cluster.workers[_id].code === id) {
+                        cluster.workers[_id].send({ event, data });
+                        break;
                     }
                 }
             }
@@ -129,6 +133,8 @@ class Channel {
     }
 }
 
+Channel.code = "A";
+
 if (cluster.isMaster) {
     // Handle transmit and broadcast.
     cluster.on("message", (worker, msg) => {
@@ -139,6 +145,10 @@ if (cluster.isMaster) {
             msg = msg.data;
             Channel.emit(msg.event, ...msg.data);
         }
+    });
+} else {
+    Channel.on("ready", (code) => {
+        Channel.code = code;
     });
 }
 

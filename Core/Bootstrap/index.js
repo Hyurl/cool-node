@@ -1,5 +1,4 @@
 const express = require("express");
-const app = express();
 const session = require("express-session")(config.session);
 const cookieParser = require("cookie-parser")(config.session.secret);
 const bodyParser = require('body-parser');
@@ -14,45 +13,16 @@ const DateTime = require("../Tools/DateTime");
 const MarkdownParser = require("../Tools/MarkdownParser");
 const Functions = require("../Tools/Functions");
 const Channel = require("../Tools/Channel");
+const loadCustomHandler = require("./CustomHandlerLoader");
+
+if (!config.server.socket) {
+    config.server.socket = require("../../config").server.socket;
+}
 
 require("./ClusterManager"); // Manage cluster/multi-processes.
 
-if (Channel.isWorker || !config.server.workers) {
-    var loadCustomHandler = require("./CustomHandlerLoader");
-    // Initial headers.
-    app.set("x-powered-by", false);
-    if (config.server.showInfo || config.server.showInfo === undefined) {
-        var expressVersion = require("express/package.json").version;
-        app.use((req, res, next) => {
-            res.set({
-                "Server": `Express/${expressVersion} Node.js/${process.version}`,
-                "X-Powered-By": `Cool-Node/${version}`
-            });
-            next();
-        });
-    }
-    // Auto-redirect HTTP to HTTPS.
-    require("../Middleware/HttpsRedirector")(app);
-    // Handle subdomain requests.
-    require("../Middleware/HttpSubdomainHandler")(app);
-    // Handle static resources.
-    require("../Middleware/StaticResourceHandler")(app, express);
-    // Parse cookies.
-    app.use(cookieParser);
-    // Parse request body.
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-    // Handle accept language.
-    require("../Middleware/HttpLanguageHandler")(app);
-    // Handler XML.
-    require("../Middleware/HttpXMLHandler")(app);
-    // Handle sessions.
-    app.use(session);
-    // Handle database connection.
-    require("../Middleware/HttpDBHandler")(app);
-}
-
-var httpServer = null,
+var app = null,
+    httpServer = null,
     httpsServer = null,
     wsServer = null,
     wssServer = null,
@@ -120,6 +90,39 @@ function startSocketServer(io, name = "") {
 function startServer() {
     if (config.server.workers && !Channel.isWorker)
         return;
+    app = exports.app = express();
+    // Initial headers.
+    app.set("x-powered-by", false);
+    if (config.server.showInfo || config.server.showInfo === undefined) {
+        var expressVersion = require("express/package.json").version;
+        app.use((req, res, next) => {
+            res.set({
+                "Server": `Express/${expressVersion} Node.js/${process.version}`,
+                "X-Powered-By": `Cool-Node/${version}`
+            });
+            next();
+        });
+    }
+
+    // Auto-redirect HTTP to HTTPS.
+    require("../Middleware/HttpsRedirector")(app);
+    // Handle subdomain requests.
+    require("../Middleware/HttpSubdomainHandler")(app);
+    // Handle static resources.
+    require("../Middleware/StaticResourceHandler")(app, express);
+    // Parse cookies.
+    app.use(cookieParser);
+    // Parse request body.
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    // Handle accept language.
+    require("../Middleware/HttpLanguageHandler")(app);
+    // Handler XML.
+    require("../Middleware/HttpXMLHandler")(app);
+    // Handle sessions.
+    app.use(session);
+    // Handle database connection.
+    require("../Middleware/HttpDBHandler")(app);
     // Load user-defined middleware.
     loadCustomHandler(ROOT + "/Middleware/http", app);
     // Load pre-defined middleware.
@@ -127,48 +130,44 @@ function startServer() {
     require("../Middleware/AutoRouteHandler")(app);
 
     // Start HTTP server.
-    exports.httpServer = require("http").Server(app);
-    exports.httpServer.setTimeout(config.server.timeout || 30000);
-    exports.httpServer.listen(config.server.port, (err) => {
+    httpServer = exports.httpServer = require("http").Server(app);
+    httpServer.setTimeout(config.server.timeout || 120000);
+    httpServer.listen(config.server.port, (err) => {
         if (err) {
-            throw err;
+            console.log(err);
             process.exit(1);
         }
-        var port = exports.httpServer.address().port,
+        var port = httpServer.address().port,
             host = `${hostname}` + (port != 80 ? `:${port}` : "");
         console.log("HTTP Server started, please visit http://%s.", host);
     });
 
     if (config.server.https.port) {
         // Start HTTPS server.
-        exports.httpsServer = require("https").Server(config.server.https.credentials, app);
-        exports.httpsServer.setTimeout(config.server.timeout || 30000);
-        exports.httpsServer.listen(config.server.https.port, (err) => {
+        httpsServer = exports.httpsServer = require("https").Server(config.server.https.credentials, app);
+        httpsServer.setTimeout(config.server.timeout || 120000);
+        httpsServer.listen(config.server.https.port, (err) => {
             if (err) {
-                throw err;
+                console.log(err);
                 process.exit(1);
             }
-            var port = exports.httpsServer.address().port,
+            var port = httpsServer.address().port,
                 host = `${hostname}` + (port != 443 ? `:${port}` : "");
             console.log("HTTPS Server started, please visit https://%s.", host);
         });
     }
 
     // Start WebSocket server.
-    if (!config.server.socket) {
-        config.server.socket = require("../../config").server.socket || { autoStart: true };
-    }
-
     if (config.server.socket.autoStart) {
-        if (!exports.httpsServer || !config.server.https.forceRedirect) {
+        if (!httpsServer || !config.server.https.forceRedirect) {
             // Listen WS protocol.
-            exports.wsServer = SocketIO(exports.httpServer, config.server.socket.options);
+            exports.wsServer = SocketIO(httpServer, config.server.socket.options);
             startSocketServer(exports.wsServer, "wsServer");
         }
 
-        if (exports.httpsServer) {
+        if (httpsServer) {
             // Listen WSS protocol.
-            exports.wssServer = SocketIO(exports.httpsServer, config.server.socket.options);
+            exports.wssServer = SocketIO(httpsServer, config.server.socket.options);
             startSocketServer(exports.wssServer, "wssServer");
         }
     }
