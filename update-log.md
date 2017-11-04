@@ -1,8 +1,8 @@
 **This log starts from version 1.0.4.**
 
-## 1.3.5 beta
+## 1.4.0
 
-(2017-10-31 14:00 UTC+800)
+(2017-11-4 23:20 UTC+800)
 
 1. XSS protection supported, CSRF protection improved.
 2. I18n supported.
@@ -11,7 +11,7 @@
 5. Logging system more efficient.
 6. More tools added.
 7. Support methods extended from parent controller.
-8. Multi-processes supported.
+8. Multi-processing supported.
 
 ## 1.3.4
 
