@@ -54,6 +54,14 @@ only one server running. It can differ requests (whether they come form HTTP
 or WebSocket) by subdomains, you can use more than one subdomain to write any 
 count of applications as you want.
 
+## Multi-Processing Development
+
+Node.js is a server environment runs in single thread, although asynchronous 
+I/O gives the power to handle high concurrency, but it's not enough! 
+Multiprocessing allows you running multiple server instances in your system, 
+taking absolute advantages of multiple CPUs, and improve several times of 
+efficiency of your website.
+
 ## Example
 
 In JavaScript (`/App/Controllers/HttpTest.js`):
