@@ -1,6 +1,6 @@
 # Cool-Node
 
-**A cool and light weight web framework for Node.js to build strong**
+**A cool and light weight MVC framework for Node.js to build strong**
 **applications, with abilities of auto-routing, cross-protocol, multi-apps,**
 **and beyond.**
 
@@ -25,7 +25,7 @@ If you're interested at new features in the next version, please visit
 
 ## Auto-Routing Development
 
-Remember when you were using the node.js internal server or Express, or other 
+Remember when you were using the Node.js internal server or Express, or other 
 frameworks, you had to define routes for every actions; when you were using 
 socket.io, you complained writing too much socket.on() and socket.emit(). And 
 thinking, isn't there any way not to do this? So here comes Cool-Node.
