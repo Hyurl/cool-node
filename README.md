@@ -21,6 +21,7 @@ If you're interested at new features in the next version, please visit
 * **Fully Asynchronous Controllers.**
 * **Auto Request & Response Handlers.**
 * **Cross Protocol and Multiple Apps on One Server.**
+* **Multi-Processing and Internationalization.**
 
 ## Auto-Routing Development
 
