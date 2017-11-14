@@ -105,11 +105,13 @@ function nextFilename(filename, extname = "") {
             if (i === 0 && j === (file.length - extname.length - 1)) {
                 let num = file.substring(start.length, j);
                 if (!isNaN(num)) {
-                    lastNum = num;
+                    num = parseInt(num);
+                    if (num > lastNum)
+                        lastNum = num;
                 }
             }
         }
-        var nextNum = parseInt(lastNum) + 1;
+        var nextNum = lastNum + 1;
         return `${dir}/${basename} (${nextNum})${extname}`;
     }
 }

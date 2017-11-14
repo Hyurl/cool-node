@@ -12,7 +12,7 @@ var filename = require.main.children[0].filename,
 
 // Initiate the project.
 if (!fs.existsSync("./index.js")) {
-    fs.writeFileSync("./index.js", `const CoolNode = require("cool-node");`);
+    fs.writeFileSync("./index.js", `const CoolNode = require("cool-node");\nCoolNode.startServer();`);
 }
 if (!fs.existsSync("./config.js")) {
     xcopy(cnDir + "/config.js", "./config.js");

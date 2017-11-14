@@ -316,6 +316,8 @@ module.exports = (app) => {
                         throw new Error("500 Internal Server Error!");
                     }
                 }
+            }else if(!res.finished && data !== null && data !== undefined){
+                res.end(data);
             }
         }).catch(err => {
             var code = parseInt(err.message) || 500,

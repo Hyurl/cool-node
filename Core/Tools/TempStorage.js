@@ -42,8 +42,8 @@ class TempStorage {
                 this.error(e);
             }
         });
-        this.error = options.catch || (err => {
-            console.log(err);
+        this.error = options.error || (err => {
+            console.error(err);
         });
 
         if (Storage[this.id] === undefined) {
