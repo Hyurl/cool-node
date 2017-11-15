@@ -1,5 +1,11 @@
 **This log starts from version 1.0.4.**
 
+## 1.4.1
+
+(2017-11-15 16:32 UTC+0800)
+
+1. Fix some bugs.
+
 ## 1.4.0
 
 (2017-11-4 23:20 UTC+800)
