@@ -161,7 +161,7 @@ function csrfTokenHandler(instance, subdomain, req, res) {
     }
 }
 
-function uploadHandler(instance, method, req, res, resolve) {
+function uploadHandler(instance, method, req, res, resolve, reject) {
     if (req.method == "POST" && instance.uploadConfig.fields.length) {
         var fields = [];
         for (let field of instance.uploadConfig.fields) {
@@ -176,22 +176,29 @@ function uploadHandler(instance, method, req, res, resolve) {
                 preservePath: true,
                 storage: multer.diskStorage({
                     destination: (req, file, cb) => {
-                        if (!fs.existsSync(savePath)) {
-                            xmkdir(savePath);
+                        try {
+                            if (!fs.existsSync(savePath))
+                                xmkdir(savePath);
+                            cb(null, savePath);
+                        } catch (e) {
+                            reject(e);
                         }
-                        cb(null, savePath);
                     },
                     filename: (req, file, cb) => {
-                        if (instance.uploadConfig.filename instanceof Function) {
-                            var filename = instance.uploadConfig.filename(file);
-                        } else if (instance.uploadConfig.filename === "random") {
-                            var extname = path.extname(file.originalname),
-                                filename = randStr(32) + extname;
-                        } else { // auto-increment
-                            var nextname = nextFilename(`${savePath}/${file.originalname}`),
-                                filename = path.basename(nextname);
+                        try {
+                            if (instance.uploadConfig.filename instanceof Function) {
+                                var filename = instance.uploadConfig.filename(file);
+                            } else if (instance.uploadConfig.filename === "random") {
+                                var extname = path.extname(file.originalname),
+                                    filename = randStr(32) + extname;
+                            } else { // auto-increment
+                                var nextname = nextFilename(`${savePath}/${file.originalname}`),
+                                    filename = path.basename(nextname);
+                            }
+                            cb(null, filename);
+                        } catch (e) {
+                            reject(e);
                         }
-                        cb(null, filename);
                     }
                 }),
                 fileFilter: (req, file, cb) => {
@@ -274,7 +281,7 @@ module.exports = (app) => {
                         res.jsonpCallback = req.query[instance.jsonp];
                     }
                     // Handle file uploading.
-                    uploadHandler(instance, method, req, res, resolve);
+                    uploadHandler(instance, method, req, res, resolve, reject);
                 }
 
                 if (Class.prototype.constructor.length === 4) {
@@ -316,7 +323,7 @@ module.exports = (app) => {
                         throw new Error("500 Internal Server Error!");
                     }
                 }
-            }else if(!res.finished && data !== null && data !== undefined){
+            } else if (!res.finished && data !== null && data !== undefined) {
                 res.end(data);
             }
         }).catch(err => {
