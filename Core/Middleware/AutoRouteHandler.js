@@ -112,7 +112,7 @@ function csrfTokenHandler(instance, subdomain, req, res) {
         if (req.method == "GET") {
             // Define a setter to access and initiate CSRF token.
             Object.defineProperty(req, "csrfToken", {
-                set: (v) => {},
+                set: (v) => { },
                 get: () => {
                     if (!req.__csrfToken) {
                         if (!req.session.csrfTokens) {
@@ -297,7 +297,7 @@ module.exports = (app) => {
             if (!res.headersSent) {
                 var type = res.get("Content-Type"),
                     xml = /(text|application)\/xml\b/;
-                if (xml.test(type)) {
+                if (type && xml.test(type)) {
                     res.xml(data);
                 } else {
                     // Send data to the client.
@@ -313,6 +313,7 @@ module.exports = (app) => {
                         } else if (typeof data == "string" && res.gzip) {
                             // Send compressed data.
                             data = zlib.gzipSync(data);
+                            res.type("html");
                             res.set("Content-Encoding", "gzip");
                             res.set("Content-Length", Buffer.byteLength(data));
                             res.end(data);
@@ -324,6 +325,8 @@ module.exports = (app) => {
                     }
                 }
             } else if (!res.finished && data !== null && data !== undefined) {
+                if (typeof data !== "string")
+                    data = JSON.stringify(data);
                 res.end(data);
             }
         }).catch(err => {
